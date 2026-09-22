@@ -1,34 +1,14 @@
-// --- LẮNG NGHE & CẬP NHẬT REALTIME (TICKET, TICKER, LỜI CHÚC) ---
+// --- LẮNG NGHE & CẬP NHẬT REALTIME (TICKER & LỜI CHÚC CUỘN VÔ TẬN) ---
 let wishesQueue = [];
 let tickerTimer = null;
 let currentWishIndex = 0;
-let totalAttendees = 0;
+let isLoopBound = false;
 
-function createWishScrollCard(author, msg, timeString) {
-  const card = document.createElement('div');
-  card.className = 'wish-scroll-card';
-
-  const header = document.createElement('div');
-  header.className = 'wish-card-header';
-
-  const nameSpan = document.createElement('span');
-  nameSpan.className = 'wish-author-name';
-  nameSpan.textContent = author;
-
-  const timeSpan = document.createElement('span');
-  timeSpan.className = 'wish-time-stamp';
-  timeSpan.textContent = timeString || (new Date().toLocaleTimeString('vi-VN') + ' ' + new Date().toLocaleDateString('vi-VN'));
-
-  header.appendChild(nameSpan);
-  header.appendChild(timeSpan);
-
-  const body = document.createElement('div');
-  body.className = 'wish-message-body';
-  body.textContent = msg;
-
-  card.appendChild(header);
-  card.appendChild(body);
-  return card;
+function escapeHTML(str) {
+  if (!str) return '';
+  return String(str).replace(/[&<>'"]/g, 
+    tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+  );
 }
 
 function renderTicker(item) {
@@ -54,27 +34,62 @@ function startTickerLoop() {
   }, 4000);
 }
 
-// Lắng nghe sự kiện onChildAdded từ Firebase (< 100ms)
-if (wishesRef) {
+// Hàm render toàn bộ danh sách lời chúc kèm cơ chế Infinite Loop Scroll
+function refreshWishesDOM() {
+  const container = document.getElementById('infiniteWishesBox');
+  if (!container) return;
+
+  if (wishesQueue.length === 0) {
+    container.innerHTML = '<div style="text-align:center; padding: 24px; color: var(--text-muted); font-size: 0.9rem; font-style: italic;">Chưa có lời chúc nào. Hãy là người đầu tiên gửi lời chúc phúc nhé!</div>';
+    return;
+  }
+
+  // Tạo HTML cho từng lời chúc
+  const renderCardHTML = (w, idxKey) => `
+    <div class="wish-scroll-card" data-key="${idxKey}">
+      <div class="wish-card-header">
+        <span class="wish-author-name">${escapeHTML(w.name)}</span>
+        <span class="wish-time-stamp">${escapeHTML(w.time || '')}</span>
+      </div>
+      <div class="wish-message-body">${escapeHTML(w.message)}</div>
+    </div>
+  `;
+
+  // Nếu có từ 3 lời chúc trở lên: Nhân đôi danh sách để tạo chu kỳ vòng tròn vô tận (5, 4, 3, 2, 1 -> 5, 4, 3, 2, 1)
+  let renderList = wishesQueue;
+  if (wishesQueue.length >= 3) {
+    renderList = [...wishesQueue, ...wishesQueue];
+  }
+
+  container.innerHTML = renderList.map((item, idx) => renderCardHTML(item, idx)).join('');
+
+  // Cơ chế Infinite Scroll: Khi người dùng cuộn đến đáy chu kỳ 1, tự động lùi cuộn mượt mà không khựng
+  if (wishesQueue.length >= 3 && !isLoopBound) {
+    isLoopBound = true;
+    container.addEventListener('scroll', () => {
+      const halfHeight = container.scrollHeight / 2;
+      if (container.scrollTop >= halfHeight) {
+        container.scrollTop -= halfHeight;
+      } else if (container.scrollTop <= 0) {
+        container.scrollTop += halfHeight;
+      }
+    });
+  }
+}
+
+// Lắng nghe sự kiện realtime onChildAdded từ Firebase
+if (typeof wishesRef !== 'undefined' && wishesRef) {
   wishesRef.on('child_added', (snapshot) => {
     const item = snapshot.val();
-    const id = 'wish-' + snapshot.key;
+    const key = snapshot.key;
 
-    // 1. Cập nhật Live Ticket số người tham dự
-    //if (item.attending === true || item.attendance === 'yes') {
-     // totalAttendees += (parseInt(item.guests, 10) || 1);
-      //const countEl = document.getElementById('statAttendeeCount');
-      //if (countEl) countEl.textContent = totalAttendees;
-    //}
-
-    // 2. Cập nhật Danh sách Lời chúc & Ticker
-    if (!document.getElementById(id)) {
-      const card = createWishScrollCard(item.name, item.message, item.time);
-      card.id = id;
-      const container = document.getElementById('infiniteWishesBox');
-      if (container) container.prepend(card);
-
+    // Kiểm tra chống trùng lặp dữ liệu
+    const exists = wishesQueue.some(w => w._key === key);
+    if (!exists) {
+      item._key = key;
+      // Đưa lời chúc mới nhất lên đầu danh sách
       wishesQueue.unshift(item);
+      refreshWishesDOM();
       startTickerLoop();
     }
   });

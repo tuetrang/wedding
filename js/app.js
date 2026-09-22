@@ -4,6 +4,12 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx7aYHQKPQQfAoi56u20
 document.addEventListener('DOMContentLoaded', () => {
   'use strict';
 
+  // Tắt tính năng tự nhớ vị trí cuộn của trình duyệt khi load trang
+  if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+  }
+  window.scrollTo(0, 0);
+
   const customAlert = document.getElementById('customAlert');
   const alertMsg = document.getElementById('alertMsg');
   document.getElementById('alertOkBtn')?.addEventListener('click', () => customAlert.classList.remove('active'));
@@ -40,8 +46,16 @@ document.addEventListener('DOMContentLoaded', () => {
   btnOpen?.addEventListener('click', () => {
     if (btnOpen.dataset.opened === '1') return;
     btnOpen.dataset.opened = '1';
+
+    // 1. TỰ ĐỘNG ĐƯA TOÀN BỘ TRANG VỀ TRÊN CÙNG HẾT
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+
+    // 2. Mở màn hình bìa thiệp
     gateScreen?.classList.add('opened');
 
+    // 3. Tự phát nhạc
     if (audioPlayer) {
       audioPlayer.muted = false;
       audioPlayer.volume = 1.0;
@@ -86,7 +100,23 @@ document.addEventListener('DOMContentLoaded', () => {
   setInterval(updateCountdown, 1000);
   updateCountdown();
 
-  // --- SUBMIT FORM VỚI CƠ CHẾ SONG SONG + CHỐNG SPAM TURNSTILE ---
+  // --- XỬ LÝ CHỌN SỐ LƯỢNG KHÁCH (CÓ Ô SỐ KHÁC) ---
+  const guestsSelect = document.getElementById('rsvpGuestsSelect');
+  const guestsCustom = document.getElementById('rsvpGuestsCustom');
+
+  if (guestsSelect && guestsCustom) {
+    guestsSelect.addEventListener('change', () => {
+      if (guestsSelect.value === 'other') {
+        guestsCustom.style.display = 'block';
+        guestsCustom.focus();
+      } else {
+        guestsCustom.style.display = 'none';
+        guestsCustom.value = '';
+      }
+    });
+  }
+
+  // --- SUBMIT FORM VỚI CƠ CHẾ SONG SONG (FIREBASE + GOOGLE SHEET) ---
   const rsvpForm = document.getElementById('rsvpForm');
   const loadingOverlay = document.getElementById('loadingOverlay');
 
@@ -94,7 +124,6 @@ document.addEventListener('DOMContentLoaded', () => {
     rsvpForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      // Cooldown chống Spam
       const lastSubmitTime = localStorage.getItem('lastRsvpSubmit');
       if (lastSubmitTime && (Date.now() - parseInt(lastSubmitTime, 10)) < 30000) {
         showAlert("Bạn thao tác quá nhanh. Vui lòng chờ 30 giây!");
@@ -102,12 +131,25 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       const submitBtn = document.getElementById('btnSubmitRsvp');
-      const nameVal = document.getElementById('nameInput').value.trim().slice(0, 50);
-      const attendingVal = document.getElementById('attendingSelect').value === 'true';
-      const guestsVal = parseInt(document.getElementById('guestCountSelect').value, 10) || 1;
-      const msgVal = document.getElementById('msgInput').value.trim().slice(0, 200);
+      const nameVal = document.getElementById('nameInput')?.value.trim().slice(0, 50);
+      const attendingVal = document.getElementById('attendingSelect')?.value === 'true';
 
-      if (!nameVal || !msgVal) return;
+      let guestsVal = 1;
+      if (guestsSelect) {
+        if (guestsSelect.value === 'other' && guestsCustom) {
+          const parsed = parseInt(guestsCustom.value, 10);
+          guestsVal = (!isNaN(parsed) && parsed > 0) ? parsed : 1;
+        } else {
+          guestsVal = parseInt(guestsSelect.value, 10) || 1;
+        }
+      }
+
+      const msgVal = document.getElementById('msgInput')?.value.trim().slice(0, 300);
+
+      if (!nameVal || !msgVal) {
+        showAlert("Vui lòng nhập tên và lời chúc phúc!");
+        return;
+      }
 
       const currentTimeStr = new Date().toLocaleTimeString('vi-VN') + ' ' + new Date().toLocaleDateString('vi-VN');
       const payload = {
@@ -124,12 +166,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (submitBtn) submitBtn.disabled = true;
 
       try {
-        if (wishesRef) {
-          // BƯỚC 1: Đẩy Firebase cực nhanh (< 100ms) -> UI Realtime tự nhảy
+        if (typeof wishesRef !== 'undefined' && wishesRef) {
           const newRef = wishesRef.push();
           const firebasePromise = newRef.set(payload);
 
-          // BƯỚC 2: Gọi ngầm Google Apps Script (Song song, không chờ)
           fetch(SCRIPT_URL, {
             method: 'POST',
             mode: 'no-cors',
@@ -139,7 +179,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
           await firebasePromise;
         } else {
-          // Fallback nếu chưa gắn Firebase
           await fetch(SCRIPT_URL, {
             method: 'POST',
             mode: 'no-cors',
@@ -150,11 +189,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         localStorage.setItem('lastRsvpSubmit', Date.now().toString());
         showAlert("Cảm ơn bạn đã gửi lời chúc phúc và xác nhận tham dự!");
-        document.getElementById('msgInput').value = '';
-        if (window.turnstile) turnstile.reset();
+        
+        rsvpForm.reset();
+        if (guestsCustom) {
+          guestsCustom.style.display = 'none';
+          guestsCustom.value = '';
+        }
 
       } catch (err) {
-        showAlert("Gửi thành công! Lời chúc đã được lưu tạm.");
+        showAlert("Gửi thành công! Lời chúc đã được ghi nhận.");
       } finally {
         loadingOverlay?.classList.remove('active');
         if (submitBtn) submitBtn.disabled = false;
@@ -175,60 +218,162 @@ document.addEventListener('DOMContentLoaded', () => {
     floatingWidget?.classList.remove('minimized');
   });
 
-  // --- COVERFLOW & LIGHTBOX NGUYÊN BẢN ---
+  // ====================================================================
+  // --- ALBUM 3D COVERFLOW: BẤM NÚT + DOTS + VUỐT TAY TRÊN ĐIỆN THOẠI ---
+  // ====================================================================
   const cards = document.querySelectorAll('.coverflow-card');
+  const dotsBox = document.getElementById('dotsBox');
+  const btnNext = document.getElementById('btnNext');
+  const btnPrev = document.getElementById('btnPrev');
+  const wrapper = document.getElementById('coverflowWrapper');
+  const lightbox = document.getElementById('lightboxModal');
+  const zoomImg = document.getElementById('lightboxZoomImg');
+
   let currentCardIndex = 0;
-  let autoPlayInterval = null;
-  const lightboxOverlay = document.getElementById('lightboxOverlay');
-  const lightboxImg = document.getElementById('lightboxImg');
+  let autoPlayTimer = null;
 
-  function updateCoverflow(index) {
-    currentCardIndex = (index + cards.length) % cards.length;
-    cards.forEach((card, i) => {
-      card.className = 'coverflow-card';
-      let diff = i - currentCardIndex;
-      if (diff > cards.length / 2) diff -= cards.length;
-      if (diff < -cards.length / 2) diff += cards.length;
-
-      if (diff === 0) card.classList.add('active');
-      else if (diff === -1) card.classList.add('prev-1');
-      else if (diff === -2) card.classList.add('prev-2');
-      else if (diff === 1) card.classList.add('next-1');
-      else if (diff === 2) card.classList.add('next-2');
-      else card.classList.add('hidden-card');
+  // 1. Tạo thanh chấm Dots điều hướng
+  if (dotsBox && cards.length > 0) {
+    dotsBox.innerHTML = '';
+    cards.forEach((_, idx) => {
+      const dot = document.createElement('div');
+      dot.className = `dot-item ${idx === 0 ? 'active' : ''}`;
+      dot.addEventListener('click', (e) => {
+        e.stopPropagation();
+        goToSlide(idx);
+      });
+      dotsBox.appendChild(dot);
     });
   }
 
-  document.getElementById('nextBtn')?.addEventListener('click', () => {
-    updateCoverflow(currentCardIndex + 1);
+  const dots = document.querySelectorAll('.dot-item');
+
+  // 2. Tính toán phân tầng phối cảnh 3D
+  function updateCoverflow(index) {
+    const total = cards.length;
+    if (total === 0) return;
+
+    currentCardIndex = (index + total) % total;
+
+    cards.forEach((card, i) => {
+      card.className = 'coverflow-card';
+      let diff = i - currentCardIndex;
+
+      if (diff > total / 2) diff -= total;
+      if (diff < -total / 2) diff += total;
+
+      if (diff === 0) {
+        card.classList.add('active');
+      } else if (diff === -1) {
+        card.classList.add('prev-1');
+      } else if (diff === -2) {
+        card.classList.add('prev-2');
+      } else if (diff === 1) {
+        card.classList.add('next-1');
+      } else if (diff === 2) {
+        card.classList.add('next-2');
+      } else {
+        card.classList.add('hidden-card');
+      }
+    });
+
+    dots.forEach((dot, idx) => {
+      dot.classList.toggle('active', idx === currentCardIndex);
+    });
+  }
+
+  function goToSlide(index) {
+    updateCoverflow(index);
     resetAutoPlay();
-  });
-  document.getElementById('prevBtn')?.addEventListener('click', () => {
-    updateCoverflow(currentCardIndex - 1);
-    resetAutoPlay();
+  }
+
+  function nextSlide() { goToSlide(currentCardIndex + 1); }
+  function prevSlide() { goToSlide(currentCardIndex - 1); }
+
+  btnNext?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    nextSlide();
   });
 
+  btnPrev?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    prevSlide();
+  });
+
+  // 3. Click vào ảnh: Ở giữa mở Lightbox, ở 2 bên trượt về giữa
   cards.forEach((card, idx) => {
-    card.addEventListener('click', () => {
+    card.addEventListener('click', (e) => {
+      e.stopPropagation();
       if (idx === currentCardIndex) {
-        if (lightboxImg && lightboxOverlay) {
-          lightboxImg.src = card.querySelector('img').src;
-          lightboxOverlay.classList.add('active');
+        const clickedImg = card.querySelector('img');
+        if (clickedImg && zoomImg && lightbox) {
+          zoomImg.src = clickedImg.src;
+          lightbox.classList.add('active');
         }
       } else {
-        updateCoverflow(idx);
-        resetAutoPlay();
+        goToSlide(idx);
       }
     });
   });
 
-  document.getElementById('lightboxClose')?.addEventListener('click', () => lightboxOverlay?.classList.remove('active'));
-  lightboxOverlay?.addEventListener('click', (e) => {
-    if (e.target === lightboxOverlay) lightboxOverlay.classList.remove('active');
+  // 4. Tự động chuyển slide mượt mà
+  function startAutoPlay() {
+    if (cards.length > 0) {
+      clearInterval(autoPlayTimer);
+      autoPlayTimer = setInterval(nextSlide, 3200);
+    }
+  }
+
+  function resetAutoPlay() {
+    clearInterval(autoPlayTimer);
+    startAutoPlay();
+  }
+
+  wrapper?.addEventListener('mouseenter', () => clearInterval(autoPlayTimer));
+  wrapper?.addEventListener('mouseleave', () => startAutoPlay());
+
+  // 5. CƠ CHẾ VUỐT CẢM ỨNG TRÊN MÀN HÌNH ĐIỆN THOẠI (TOUCH SWIPE)
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let isSwiping = false;
+
+  wrapper?.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+    touchStartY = e.changedTouches[0].screenY;
+    isSwiping = true;
+    clearInterval(autoPlayTimer);
+  }, { passive: true });
+
+  wrapper?.addEventListener('touchend', (e) => {
+    if (!isSwiping) return;
+    isSwiping = false;
+
+    const touchEndX = e.changedTouches[0].screenX;
+    const touchEndY = e.changedTouches[0].screenY;
+
+    const diffX = touchStartX - touchEndX;
+    const diffY = touchStartY - touchEndY;
+
+    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 35) {
+      if (diffX > 0) {
+        nextSlide();
+      } else {
+        prevSlide();
+      }
+    }
+
+    startAutoPlay();
+  }, { passive: true });
+
+  // 6. Đóng Lightbox
+  document.getElementById('lightboxClose')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    lightbox?.classList.remove('active');
   });
 
-  function startAutoPlay() { autoPlayInterval = setInterval(() => updateCoverflow(currentCardIndex + 1), 3500); }
-  function resetAutoPlay() { clearInterval(autoPlayInterval); startAutoPlay(); }
+  lightbox?.addEventListener('click', (e) => {
+    if (e.target === lightbox) lightbox.classList.remove('active');
+  });
 
   // --- URL PARAMS GUEST INJECTION (?invite=) ---
   const params = new URLSearchParams(window.location.search);
@@ -249,6 +394,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.target === giftModal) giftModal.classList.remove('active');
   });
 
+  // Khởi chạy Coverflow
   updateCoverflow(0);
   startAutoPlay();
 });
