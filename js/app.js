@@ -94,13 +94,6 @@ document.addEventListener('DOMContentLoaded', () => {
     rsvpForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      // Kiểm tra Cloudflare Turnstile
-      const turnstileResp = rsvpForm.querySelector('[name="cf-turnstile-response"]')?.value;
-      if (turnstileResp === "") {
-        showAlert("Vui lòng xác minh bảo mật Turnstile trước khi gửi!");
-        return;
-      }
-
       // Cooldown chống Spam
       const lastSubmitTime = localStorage.getItem('lastRsvpSubmit');
       if (lastSubmitTime && (Date.now() - parseInt(lastSubmitTime, 10)) < 30000) {

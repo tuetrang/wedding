@@ -1,14 +1,14 @@
 :root {
-  --bg-cream: #FAF6F0;
-  --card-cream: #FFFDF9;
-  --text-brown: #5C4028;
-  --text-main: #3D2B1F;
-  --text-muted: #6B5B4F;
-  --btn-brown: #A06835;
-  --btn-hover: #8C5629;
-  --btn-navy: #1E293B;
-  --btn-navy-hover: #0F172A;
-  --border-soft: rgba(184, 115, 51, 0.25);
+  --bg-cream: #EBF1E8;
+  --card-cream: #F3F7F0;
+  --text-brown: #2D4230;
+  --text-main: #202D22;
+  --text-muted: #5C7060;
+  --btn-brown: #6F9468;
+  --btn-hover: #5B7D55;
+  --btn-navy: #2A3B2D;
+  --btn-navy-hover: #1E2B20;
+  --border-soft: rgba(111, 148, 104, 0.3);
   --font-serif: 'Cormorant Garamond', serif;
   --font-sans: 'Montserrat', sans-serif;
 }
@@ -16,7 +16,7 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 body {
-  background-color: #D6C5B3;
+  background-color: #cad8c8;
   color: var(--text-main);
   font-family: var(--font-sans);
   font-size: 16px;
@@ -24,14 +24,15 @@ body {
   overflow-x: hidden;
 }
 
-/* --- NÚT ĐIỀU KHIỂN NHẠC CỐ ĐỊNH --- */
+
+/* --- Fixed music button --- */
 .music-btn {
   position: fixed !important;
   bottom: 24px !important;
   right: 20px !important;
   width: 48px !important;
   height: 48px !important;
-  background: #FFFDF9 !important;
+  background: var(--card-cream) !important;
   border: 1.5px solid var(--btn-brown) !important;
   border-radius: 50% !important;
   display: flex !important;
@@ -39,7 +40,7 @@ body {
   justify-content: center !important;
   cursor: pointer !important;
   z-index: 999999 !important;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15) !important;
   color: var(--btn-brown) !important;
   font-size: 1.25rem !important;
   user-select: none;
@@ -47,7 +48,7 @@ body {
   transition: transform 0.2s ease, background 0.2s ease;
 }
 .music-btn:hover {
-  background: #FAF6F0 !important;
+  background: var(--bg-cream) !important;
   transform: scale(1.08);
 }
 .music-btn.playing {
@@ -58,7 +59,7 @@ body {
 }
 @keyframes pulseNeedsTap {
   0%, 100% { box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-  50% { box-shadow: 0 4px 22px rgba(201,162,39,0.75); }
+  50% { box-shadow: 0 4px 22px rgba(111, 148, 104, 0.75); }
 }
 @keyframes spinMusic {
   100% { transform: rotate(360deg); }
@@ -67,25 +68,27 @@ body {
 /* --- TICKER LỜI CHÚC GÓC DƯỚI TRÁI --- */
 .floating-ticker-widget {
   position: fixed; bottom: 24px; left: 20px; z-index: 900;
-  max-width: 320px; width: 100%; background: rgba(61, 43, 31, 0.92);
-  backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px; padding: 12px 14px; color: #fff; box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+  max-width: 320px; width: 100%; 
+  background: rgba(42, 59, 45, 0.95); /* Xanh olive đậm mờ kính */
+  backdrop-filter: blur(10px); 
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px; padding: 12px 14px; color: #fff; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
   transition: all 0.3s ease;
 }
 .floating-ticker-widget.minimized { opacity: 0; transform: scale(0.8) translateY(20px); pointer-events: none; }
 .ticker-header {
   display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;
-  font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; color: #F4D3AD;
+  font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; color: #E2EFE0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.15); padding-bottom: 4px; font-weight: 700;
 }
 .ticker-close-btn { 
   background: none; border: none; color: #fff; cursor: pointer; font-size: 1rem; 
   padding: 0 4px; line-height: 1; transition: color 0.2s;
 }
-.ticker-close-btn:hover { color: #F4D3AD; }
+.ticker-close-btn:hover { color: #E2EFE0; }
 .ticker-content-box { min-height: 42px; display: flex; align-items: center; overflow: hidden; }
 .ticker-slide-item { font-size: 0.88rem; line-height: 1.4; color: #FAF6F0; animation: fadeInOut 4s ease infinite; width: 100%; }
-.ticker-slide-item strong { color: #F4D3AD; margin-right: 4px; font-weight: 700; }
+.ticker-slide-item strong { color: #CDE6CA; margin-right: 4px; font-weight: 700; }
 @keyframes fadeInOut {
   0% { opacity: 0; transform: translateY(6px); }
   15% { opacity: 1; transform: translateY(0); }
@@ -110,7 +113,7 @@ body {
 .custom-alert-card {
   background: var(--card-cream); max-width: 360px; width: 100%; border-radius: 12px;
   padding: 26px 20px; text-align: center; border: 1px solid var(--border-soft);
-  box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.15);
 }
 .custom-alert-card h4 { font-family: var(--font-serif); font-size: 1.5rem; color: var(--text-brown); margin-bottom: 6px; font-weight: 700; }
 .custom-alert-card p { font-size: 0.92rem; color: var(--text-muted); margin-bottom: 18px; }
@@ -143,7 +146,7 @@ body {
 /* --- MÀN HÌNH CHÀO MỞ THIỆP --- */
 #gateScreen {
   position: fixed; inset: 0;
-  background-color: #B28E6B;
+  background-color: var(--btn-brown); /* Nền bìa thiệp xanh matcha bơ */
   z-index: 99999; display: flex; align-items: center; justify-content: center; padding: 20px;
   transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.7s ease;
 }
@@ -154,7 +157,7 @@ body {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  background-color: #FFFDF9;
+  background-color: var(--card-cream);
   border-radius: 12px;
   max-width: 480px; width: 100%; min-height: 520px; 
   padding: 45px 30px;
@@ -163,7 +166,7 @@ body {
   box-shadow: 0 25px 70px rgba(0, 0, 0, 0.25);
 }
 .gate-inner-content {
-  background: #FFFDF9;
+  background: var(--card-cream);
   padding: 35px 20px;
   border-radius: 12px; width: 100%; max-width: 360px;
   box-shadow: 0 8px 30px rgba(0,0,0,0.08);
@@ -179,20 +182,22 @@ body {
 }
 .gate-names span { display: block; font-size: 1.2rem; font-style: italic; color: var(--text-muted); margin: 3px 0; font-weight: 600; }
 .gate-divider { margin: 12px auto; width: 40px; height: 1px; background: var(--btn-brown); position: relative; }
-.gate-date { font-size: 0.9rem; letter-spacing: 0.1em; color: #6E533C; margin-bottom: 10px; font-weight: 600; }
+.gate-date { font-size: 0.9rem; letter-spacing: 0.1em; color: var(--text-brown); margin-bottom: 10px; font-weight: 600; }
 .gate-guest-box { margin: 12px 0 18px; padding: 0; background: transparent; border: none; }
 .gate-guest-box small { display: block; font-size: 0.72rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-muted); font-weight: 700; }
 .gate-guest-name { font-family: var(--font-serif); font-size: 1.45rem; font-weight: 700; color: var(--text-brown); }
 .btn-gate-open {
   background: var(--btn-brown); color: #fff; border: none; padding: 12px 40px; border-radius: 25px;
   font-size: 0.8rem; letter-spacing: 0.15em; text-transform: uppercase; font-weight: 700; cursor: pointer;
+  transition: background 0.2s ease;
 }
+.btn-gate-open:hover { background: var(--btn-hover); }
 
-/* --- NỘI DUNG CHÍNH --- */
+/* --- NỘI DUNG CHÍNH--- */
 .wrapper {
   max-width: 680px;
   margin: 0 auto;
-  background-color: #FFFDF9;
+  background-color: var(--bg-cream) !important;
   background-image: url('https://lh3.googleusercontent.com/d/1EZK-SHaV6z29Gkaw0-ZTeaolO1xv9hyj');
   background-size: 100% auto;
   background-repeat: repeat-y;
@@ -206,7 +211,7 @@ body {
   padding: 65px 15px 35px 15px;
   text-align: center;
   position: relative;
-  background: rgba(250, 246, 240, 0.6);
+  background: rgba(235, 241, 232, 0.78) !important;
   border-bottom: 1px solid var(--border-soft);
   border-top: none;
 }
@@ -357,7 +362,7 @@ body {
 .reception-details-section {
   padding: 45px 20px;
   text-align: center;
-  background: rgba(250, 246, 240, 0.6);
+  background: rgba(235, 241, 232, 0.78) !important;
   border-top: 1px solid var(--border-soft);
   border-bottom: 1px solid var(--border-soft);
 }
@@ -382,7 +387,7 @@ body {
 .reception-main-time {
   font-family: var(--font-sans);
   font-size: 2.5rem;
-  color: #78716C;
+  color: var(--text-brown);
   font-weight: 700;
   margin-bottom: 15px;
 }
@@ -418,11 +423,11 @@ body {
   padding: 0 10px;
 }
 .countdown-card {
-  background: #FFFDF9;
+  background: var(--card-cream) !important;
   border: 1px solid var(--border-soft);
   border-radius: 12px;
   padding: 14px 6px;
-  box-shadow: 0 4px 15px rgba(92, 64, 40, 0.06);
+  box-shadow: 0 4px 15px rgba(45, 66, 48, 0.05);
 }
 .countdown-number {
   font-family: var(--font-sans);
@@ -455,7 +460,7 @@ body {
   text-transform: uppercase;
   cursor: pointer;
   margin-top: 25px;
-  box-shadow: 0 4px 15px rgba(160, 104, 53, 0.3);
+  box-shadow: 0 4px 15px rgba(111, 148, 104, 0.3);
   transition: all 0.2s ease;
   text-decoration: none;
 }
@@ -468,7 +473,7 @@ body {
   margin: 25px auto 15px;
   padding: 30px 20px;
   border: 1px solid var(--border-soft);
-  background: rgba(255, 253, 249, 0.75);
+  background: rgba(243, 247, 240, 0.85) !important;
 }
 .cal-corner {
   position: absolute; width: 30px; height: 30px; border: 2px solid var(--btn-brown); opacity: 0.6;
@@ -487,7 +492,7 @@ body {
 .calendar-heart-highlight {
   display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px;
   background-color: var(--btn-brown); color: #fff; border-radius: 50% 50% 5px 50%;
-  transform: rotate(-45deg); box-shadow: 0 4px 10px rgba(184, 115, 51, 0.4); margin: 0 auto;
+  transform: rotate(-45deg); box-shadow: 0 4px 10px rgba(111, 148, 104, 0.4); margin: 0 auto;
 }
 .calendar-heart-highlight span { transform: rotate(45deg); font-weight: 700; }
 .btn-add-calendar-link {
@@ -500,7 +505,7 @@ body {
 /* --- ALBUM ẢNH 3D COVERFLOW --- */
 .album-section {
   padding: 50px 0;
-  background: rgba(250, 246, 240, 0.6);
+  background: rgba(235, 241, 232, 0.78) !important;
   border-top: 1px solid var(--border-soft);
   border-bottom: 1px solid var(--border-soft);
   text-align: center;
@@ -524,7 +529,7 @@ body {
   border: 4px solid #fff; cursor: pointer; transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
 }
 .coverflow-card img { width: 100%; height: 100%; object-fit: cover; }
-.coverflow-card.active { transform: translateX(0) scale(1) rotateY(0deg); z-index: 10; opacity: 1; box-shadow: 0 20px 45px rgba(92, 64, 40, 0.35); }
+.coverflow-card.active { transform: translateX(0) scale(1) rotateY(0deg); z-index: 10; opacity: 1; box-shadow: 0 20px 45px rgba(45, 66, 48, 0.3); }
 .coverflow-card.prev-1 { transform: translateX(-150px) scale(0.82) rotateY(25deg); z-index: 6; opacity: 0.85; }
 .coverflow-card.prev-2 { transform: translateX(-280px) scale(0.68) rotateY(35deg); z-index: 2; opacity: 0.5; }
 .coverflow-card.next-1 { transform: translateX(150px) scale(0.82) rotateY(-25deg); z-index: 6; opacity: 0.85; }
@@ -533,7 +538,7 @@ body {
 
 .coverflow-btn {
   position: absolute; top: 50%; transform: translateY(-50%); width: 42px; height: 42px;
-  background: rgba(184, 115, 51, 0.85); color: #fff; border: none; border-radius: 50%;
+  background: rgba(111, 148, 104, 0.88); color: #fff; border: none; border-radius: 50%;
   font-size: 1.1rem; cursor: pointer; z-index: 20; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
   display: flex; align-items: center; justify-content: center;
 }
@@ -556,15 +561,21 @@ body {
 
 /* --- PHẦN TIỆC CƯỚI & SỔ LƯU BÚT --- */
 .extra-section {
-  padding: 60px 20px; background: rgba(255, 253, 249, 0.85); border-top: 1px solid var(--border-soft); text-align: center;
+  padding: 60px 20px; 
+  background: rgba(235, 241, 232, 0.78) !important; 
+  border-top: 1px solid var(--border-soft); 
+  text-align: center;
 }
 .extra-section-title {
   font-family: var(--font-serif); font-size: 1.4rem; color: var(--text-brown);
   margin-bottom: 30px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
 }
 .event-box {
-  background: #FFF; border: 1px solid var(--border-soft); border-radius: 12px;
-  padding: 26px 22px; margin-bottom: 24px; text-align: left; box-shadow: 0 4px 15px rgba(92, 64, 40, 0.05);
+  background: var(--card-cream) !important; 
+  border: 1px solid var(--border-soft); 
+  border-radius: 12px;
+  padding: 26px 22px; margin-bottom: 24px; text-align: left; 
+  box-shadow: 0 4px 15px rgba(45, 66, 48, 0.04);
 }
 .event-box h3 { font-family: var(--font-serif); font-size: 1.3rem; color: var(--text-brown); font-weight: 700; }
 .map-frame-container { width: 100%; height: 220px; border-radius: 8px; overflow: hidden; margin: 16px 0; }
@@ -578,12 +589,12 @@ body {
 
 /* --- FORM XÁC NHẬN THAM DỰ & LỜI CHÚC --- */
 .rsvp-form-card {
-  background: #FFFDF9;
-  border: 1px solid rgba(184, 115, 51, 0.25);
+  background: var(--card-cream) !important;
+  border: 1px solid var(--border-soft);
   border-radius: 20px;
   padding: 35px 24px;
   margin: 25px 0;
-  box-shadow: 0 10px 30px rgba(92, 64, 40, 0.05);
+  box-shadow: 0 10px 30px rgba(45, 66, 48, 0.05);
   text-align: left;
 }
 .rsvp-form-header-badge {
@@ -601,7 +612,7 @@ body {
   font-family: var(--font-serif);
   font-size: 2rem;
   font-weight: 700;
-  color: #1E293B;
+  color: var(--text-brown);
   margin-bottom: 6px;
   line-height: 1.2;
 }
@@ -619,29 +630,29 @@ body {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   font-weight: 700;
-  color: #475569;
+  color: var(--text-muted);
   margin-bottom: 8px;
 }
 .form-input-custom,
 .form-select-custom,
 .form-textarea-custom {
   width: 100%;
-  background: #FAF8F5;
-  border: 1px solid #E2E8F0;
+  background: #E5EDE1 !important;
+  border: 1px solid rgba(111, 148, 104, 0.35) !important;
   border-radius: 12px;
   padding: 13px 16px;
   font-family: var(--font-sans);
   font-size: 0.95rem;
-  color: #1E293B;
+  color: var(--text-main);
   outline: none;
   transition: all 0.2s ease;
 }
 .form-input-custom:focus,
 .form-select-custom:focus,
 .form-textarea-custom:focus {
-  border-color: var(--btn-brown);
-  background: #FFF;
-  box-shadow: 0 0 0 3px rgba(160, 104, 53, 0.15);
+  border-color: var(--btn-brown) !important;
+  background: #FFFDFB !important;
+  box-shadow: 0 0 0 3px rgba(111, 148, 104, 0.2);
 }
 .form-row-dual {
   display: grid;
@@ -650,8 +661,8 @@ body {
 }
 .btn-submit-navy {
   width: 100%;
-  background: var(--btn-navy);
-  color: #F4D3AD;
+  background: var(--btn-brown);
+  color: #D9ECD4;
   border: none;
   padding: 16px;
   border-radius: 12px;
@@ -669,7 +680,7 @@ body {
   transition: background 0.2s, transform 0.1s;
 }
 .btn-submit-navy:hover {
-  background: var(--btn-navy-hover);
+  background: var(--btn-hover);
   transform: translateY(-1px);
 }
 .btn-submit-navy:disabled {
@@ -691,21 +702,21 @@ body {
   width: 6px;
 }
 .infinite-wishes-scroll-box::-webkit-scrollbar-track {
-  background: rgba(184, 115, 51, 0.08);
+  background: rgba(111, 148, 104, 0.1);
   border-radius: 10px;
 }
 .infinite-wishes-scroll-box::-webkit-scrollbar-thumb {
-  background: #D4B89A;
+  background: #9DBF96;
   border-radius: 10px;
 }
 
 .wish-scroll-card {
-  background: #FFFDF9;
-  border: 1px solid rgba(184, 115, 51, 0.2);
+  background: var(--card-cream) !important;
+  border: 1px solid var(--border-soft);
   border-radius: 14px;
   padding: 16px 20px;
   text-align: left;
-  box-shadow: 0 2px 8px rgba(92, 64, 40, 0.03);
+  box-shadow: 0 2px 8px rgba(45, 66, 48, 0.03);
   position: relative;
 }
 .wish-card-header {
@@ -723,13 +734,13 @@ body {
 .wish-time-stamp {
   font-family: var(--font-sans);
   font-size: 0.75rem;
-  color: #9CA3AF;
+  color: var(--text-muted);
   font-weight: 500;
 }
 .wish-message-body {
   font-family: var(--font-sans);
   font-size: 0.9rem;
-  color: #4B5563;
+  color: var(--text-main);
   line-height: 1.5;
 }
 
@@ -758,7 +769,7 @@ body {
   width: 100%;
   height: auto;
   display: block;
-  filter: drop-shadow(0 15px 25px rgba(92, 64, 40, 0.18));
+  filter: drop-shadow(0 15px 25px rgba(45, 66, 48, 0.15));
   transition: transform 0.3s ease;
 }
 .floating-envelope-wrapper:hover .floating-envelope-img {
@@ -770,21 +781,21 @@ body {
   100% { transform: translateY(0px) rotate(0deg); }
 }
 
-/* --- MODAL HỘP QUÀ MỪNG (QR CODE THANH TOÁN ONLINE) --- */
+/* --- MODAL HỘP QUÀ MỪNG --- */
 .qr-modal-overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(5px);
   z-index: 100001; display: flex; align-items: center; justify-content: center;
-  padding: env(safe-area-inset-top, 20px) 15px env(safe-area-inset-bottom, 20px);
+  padding: env(safe-area-inset-top, 20px) 15px env(safe-area-inset-bottom, 20px) !important;
   opacity: 0; visibility: hidden; transition: all 0.3s ease;
 }
 .qr-modal-overlay.active { opacity: 1; visibility: visible; }
 .qr-modal-card {
-  background: #FFFDF9; max-width: 600px; width: 100%; border-radius: 20px;
+  background: var(--card-cream); max-width: 600px; width: 100%; border-radius: 20px;
   overflow: hidden; box-shadow: 0 25px 60px rgba(0,0,0,0.35); position: relative;
-  max-height: 85dvh; display: flex; flex-direction: column;
+  max-height: 85dvh !important; display: flex; flex-direction: column;
 }
 .qr-modal-header {
-  background: #0D253A;
+  background: var(--btn-brown);
   padding: 22px 20px;
   text-align: center;
   position: sticky;
@@ -803,7 +814,7 @@ body {
 }
 .qr-modal-close {
   position: absolute; top: 18px; right: 20px; width: 34px; height: 34px;
-  background: rgba(255,255,255,0.12); border: none; border-radius: 50%;
+  background: rgba(255,255,255,0.15); border: none; border-radius: 50%;
   color: #FFF; font-size: 1.5rem; cursor: pointer; line-height: 1;
   display: flex; align-items: center; justify-content: center;
 }
@@ -825,14 +836,14 @@ body {
   font-family: var(--font-sans);
   font-size: 0.88rem;
   font-weight: 700;
-  color: #0F172A;
+  color: var(--text-brown);
   margin-bottom: 12px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 .qr-image-frame {
   background: #FFF;
-  border: 1px solid #E2E8F0;
+  border: 1px solid var(--border-soft);
   border-radius: 16px;
   padding: 12px;
   box-shadow: 0 4px 15px rgba(0,0,0,0.06);
@@ -848,39 +859,47 @@ body {
 }
 .bank-name-text {
   font-size: 0.85rem;
-  color: #64748B;
+  color: var(--text-muted);
   margin-bottom: 2px;
 }
 .bank-acc-number {
   font-family: var(--font-sans);
   font-size: 1rem;
   font-weight: 800;
-  color: #0F172A;
+  color: var(--text-brown);
   margin-bottom: 2px;
 }
 .bank-acc-owner {
   font-size: 0.82rem;
   font-weight: 700;
-  color: #334155;
+  color: var(--text-main);
   text-transform: uppercase;
   margin-bottom: 12px;
 }
 .btn-download-qr {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  background: #E2E8F0;
-  color: #334155;
+  background: #D8E2D4;
+  color: var(--text-main);
   text-decoration: none;
-  padding: 6px 18px;
+  padding: 8px 18px;
   border-radius: 20px;
   font-size: 0.8rem;
   font-weight: 700;
+  cursor: pointer;
   transition: all 0.2s ease;
 }
 .btn-download-qr:hover {
   background: var(--btn-brown);
   color: #FFF;
+}
+.btn-download-qr svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+  vertical-align: middle;
 }
 
 @media (max-width: 480px) {
@@ -895,18 +914,4 @@ body {
   .countdown-number { font-size: 1.35rem; }
   .countdown-label { font-size: 0.65rem; }
   .qr-modal-body { grid-template-columns: 1fr; gap: 30px; }
-}
-
-/* --- FIX SAFARI IPHONE SAFE AREA CHO MODAL QR --- */
-.qr-modal-overlay {
-  padding: env(safe-area-inset-top, 20px) 15px env(safe-area-inset-bottom, 20px) !important;
-}
-.qr-modal-card {
-  max-height: 85dvh !important;
-}
-.btn-download-qr svg {
-  width: 16px;
-  height: 16px;
-  fill: currentColor;
-  vertical-align: middle;
 }

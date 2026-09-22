@@ -61,11 +61,11 @@ if (wishesRef) {
     const id = 'wish-' + snapshot.key;
 
     // 1. Cập nhật Live Ticket số người tham dự
-    if (item.attending === true || item.attendance === 'yes') {
-      totalAttendees += (parseInt(item.guests, 10) || 1);
-      const countEl = document.getElementById('statAttendeeCount');
-      if (countEl) countEl.textContent = totalAttendees;
-    }
+    //if (item.attending === true || item.attendance === 'yes') {
+     // totalAttendees += (parseInt(item.guests, 10) || 1);
+      //const countEl = document.getElementById('statAttendeeCount');
+      //if (countEl) countEl.textContent = totalAttendees;
+    //}
 
     // 2. Cập nhật Danh sách Lời chúc & Ticker
     if (!document.getElementById(id)) {

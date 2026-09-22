@@ -14,12 +14,12 @@
 </head>
 <body>
 
-  <!-- AUDIO PLAYER: PHÁT NHẠC TỪ ROOT -->
+  <!-- AUDIO PLAYER -->
   <audio id="audioPlayer" loop preload="auto">
     <source src="laanh.mp3" type="audio/mpeg" />
   </audio>
 
-  <!-- NÚT BẬT/TẮT NHẠC CỐ ĐỊNH -->
+  <!-- FIXED MUSIC BUTTON -->
   <div class="music-btn" id="musicToggle" title="Bật/Tắt Nhạc Nền">♫</div>
 
   <!-- TICKER LỜI CHÚC (GÓC DƯỚI TRÁI) -->
@@ -84,7 +84,7 @@
         <div class="parents-divider"></div>
         <div class="parent-column">
           <div class="role-title">Ông Bà</div>
-          <div class="parent-names">Nguyễn Tuấn Anh<br />Võ Thị Thu Cúc</div>
+          <div class="parent-names">Phạm Minh Phương<br />Võ Thị Thu Cúc</div>
           <div class="parent-location">Tỉnh Đồng Tháp</div>
         </div>
       </div>
@@ -231,7 +231,7 @@
           <span>🍃</span> XÁC NHẬN THAM DỰ & GỬI LỜI CHÚC
         </div>
         <div class="rsvp-form-title">Gửi Lời Chúc Phúc</div>
-        <div style="margin-bottom: 15px; padding: 8px 12px; background: rgba(160, 104, 53, 0.08); border-radius: 8px; font-size: 0.85rem; font-weight: 700; color: var(--btn-brown); display: flex; justify-content: space-between;"><span>ĐÃ XÁC NHẬN: <span id="statAttendeeCount" style="color:#1E293B;">0</span> NGƯỜI</span><span style="color:#10B981;">● REALTIME</span></div>
+        <!--<div style="margin-bottom: 15px; padding: 8px 12px; background: rgba(160, 104, 53, 0.08); border-radius: 8px; font-size: 0.85rem; font-weight: 700; color: var(--btn-brown); display: flex; justify-content: space-between;"><span>ĐÃ XÁC NHẬN: <span id="statAttendeeCount" style="color:#1E293B;">0</span> NGƯỜI</span><span style="color:#10B981;">● REALTIME</span></div>-->
         <div class="rsvp-form-subtitle">Sự hiện diện và lời chúc của Quý khách là niềm vinh hạnh lớn của chúng tôi.</div>
 
         <form id="rsvpForm">
@@ -256,6 +256,13 @@
                 <option value="3">3 người</option>
                 <option value="4">4 người</option>
                 <option value="5">5 người</option>
+                <option value="5">6 người</option>
+                <option value="5">7 người</option>
+                <option value="5">8 người</option>
+                <option value="5">9 người</option>
+                <option value="5">10 người</option>
+                <option value="5">11 người</option>
+                <option value="5">12 người</option>
               </select>
             </div>
           </div>
@@ -265,7 +272,6 @@
             <textarea id="msgInput" class="form-textarea-custom" rows="3" placeholder="Gửi gắm những lời chúc mừng hạnh phúc tốt đẹp nhất..." required maxlength="200"></textarea>
           </div>
 
-          <div class="form-group-custom"><div class="cf-turnstile" data-sitekey="1x00000000000000000000AA" data-theme="light"></div></div>
           <button type="submit" id="btnSubmitRsvp" class="btn-submit-navy">
             <span>✈</span> GỬI LỜI CHÚC MỪNG
           </button>
@@ -289,7 +295,7 @@
       </div>
     </div>
 
-    <footer style="padding: 35px; text-align: center; font-size: 0.85rem; color: var(--text-muted); background: #FFFDF9; font-weight: 600;">
+    <footer style="padding: 35px; text-align: center; font-size: 0.85rem; color: var(--text-muted); background: rgba(235, 241, 232, 0.78) !important; font-weight: 600;">
       NGUYỄN TUỆ & DIỄM TRANG • 2026
     </footer>
   </div>
@@ -314,24 +320,24 @@
         <div class="qr-person-card">
           <div class="qr-person-role">Chú Rể - NGUYỄN TUỆ</div>
           <div class="qr-image-frame">
-            <img src="https://api.vietqr.io/image/970436-1017788990-compact2.jpg?accountName=NGUYEN%20TUE&amount=0" alt="QR Chú Rể">
+            <img src="https://img.vietqr.io/image/TPB-07330427101-compact2.png?accountName=NGUYEN%20TUE&amount=0" alt="QR Chú Rể">
           </div>
-          <div class="bank-name-text">Vietcombank</div>
-          <div class="bank-acc-number">1017788990</div>
+          <div class="bank-name-text">TPBANK</div>
+          <div class="bank-acc-number">07330427101</div>
           <div class="bank-acc-owner">NGUYỄN TUỆ</div>
-          <a href="javascript:void(0)" onclick="downloadQRCode('https://api.vietqr.io/image/970436-1017788990-compact2.jpg?accountName=NGUYEN%20TUE&amount=0', 'QR_ChuRe_NguyenTue.jpg')" class="btn-download-qr"><svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg> <span>Lưu QR</span></a>
+          <a href="javascript:void(0)" onclick="downloadQRCode('https://img.vietqr.io/image/TPB-07330427101-compact2.png?accountName=NGUYEN%20TUE&amount=0', 'QR_ChuRe_NguyenTue.jpg')" class="btn-download-qr"><svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg> <span>Lưu QR</span></a>
         </div>
 
         <!-- Cô Dâu -->
         <div class="qr-person-card">
           <div class="qr-person-role">Cô Dâu - DIỄM TRANG</div>
           <div class="qr-image-frame">
-            <img src="https://api.vietqr.io/image/970407-1904455660-compact2.jpg?accountName=DIEM%20TRANG&amount=0" alt="QR Cô Dâu">
+            <img src="https://img.vietqr.io/image/TPB-64444060497-compact2.png?accountName=PHAM%20THI%20DIEM%20TRANG&amount=0" alt="QR Cô Dâu">
           </div>
-          <div class="bank-name-text">Techcombank</div>
-          <div class="bank-acc-number">1904455660</div>
-          <div class="bank-acc-owner">DIỄM TRANG</div>
-          <a href="javascript:void(0)" onclick="downloadQRCode('https://api.vietqr.io/image/970407-1904455660-compact2.jpg?accountName=DIEM%20TRANG&amount=0', 'QR_CoDau_DiemTrang.jpg')" class="btn-download-qr"><svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg> <span>Lưu QR</span></a>
+          <div class="bank-name-text">TPBANK</div>
+          <div class="bank-acc-number">64444060497</div>
+          <div class="bank-acc-owner">PHẠM THỊ DIỄM TRANG</div>
+          <a href="javascript:void(0)" onclick="downloadQRCode('https://img.vietqr.io/image/TPB-64444060497-compact2.png?accountName=PHAM%20THI%20DIEM%20TRANG&amount=0', 'QR_CoDau_DiemTrang.jpg')" class="btn-download-qr"><svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg> <span>Lưu QR</span></a>
         </div>
       </div>
     </div>
@@ -339,9 +345,6 @@
 
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-  <!-- Cloudflare Turnstile Script -->
-  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-
   <!-- 4 Script Modular theo đúng cấu trúc -->
   <script src="js/firebase-config.js"></script>
   <script src="js/qr.js"></script>
