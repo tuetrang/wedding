@@ -9,7 +9,7 @@
   --btn-navy: #2A3B2D;
   --btn-navy-hover: #1E2B20;
   --border-soft: rgba(111, 148, 104, 0.3);
-  /* Chuyển sang font cưới cao cấp: Playfair Display + Montserrat */
+  /* Bộ font thiệp cưới: Playfair Display + Montserrat */
   --font-serif: 'Playfair Display', serif;
   --font-sans: 'Montserrat', sans-serif;
 }
@@ -23,6 +23,24 @@ body {
   font-size: 16px;
   line-height: 1.7;
   overflow-x: hidden;
+}
+
+/* --- ÉP TRÁI TIM ĐỎ RỰC TRÊN TẤT CẢ THIẾT BỊ (IOS, ANDROID, WEB) --- */
+.red-heart {
+  color: #E03131 !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Emoji", "Apple Color Emoji", sans-serif !important;
+  font-style: normal;
+  display: inline-block;
+  vertical-align: middle;
+  filter: drop-shadow(0 2px 4px rgba(224, 49, 49, 0.35));
+}
+
+.pure-red-heart-svg,
+.heart-fab-svg {
+  display: inline-block;
+  fill: #E03131 !important;
+  vertical-align: middle;
+  filter: drop-shadow(0 2px 4px rgba(224, 49, 49, 0.4)) !important;
 }
 
 /* --- Fixed music button --- */
@@ -95,11 +113,23 @@ body {
   85% { opacity: 1; transform: translateY(0); }
   100% { opacity: 0; transform: translateY(-6px); }
 }
+
+/* NÚT TRÒN GÓC DƯỚI TRÁI (#widgetFabIcon) */
 .widget-fab-icon {
   position: fixed; bottom: 24px; left: 20px; width: 44px; height: 44px;
-  background: var(--card-cream); border: 1px solid var(--btn-brown); border-radius: 50%;
+  background: #FFFFFF !important;
+  border: 1.5px solid rgba(224, 49, 49, 0.4) !important;
+  border-radius: 50%;
   display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 901;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.15); color: var(--btn-brown); font-size: 1.2rem;
+  box-shadow: 0 4px 15px rgba(224, 49, 49, 0.25) !important;
+}
+.widget-fab-icon .red-heart {
+  font-size: 1.35rem !important;
+}
+.widget-fab-icon .pure-red-heart-svg,
+.widget-fab-icon .heart-fab-svg {
+  width: 20px !important;
+  height: 20px !important;
 }
 .floating-ticker-widget.minimized ~ .widget-fab-icon { display: flex; }
 
@@ -173,10 +203,24 @@ body {
   border: none;
 }
 .seal-heart-icon {
-  width: 46px; height: 46px; background: var(--btn-brown); border-radius: 50%;
-  display: inline-flex; align-items: center; justify-content: center; color: #fff;
-  font-size: 1.2rem; margin-bottom: 12px;
-  font-variant-emoji: text;
+  width: 48px;
+  height: 48px;
+  background: #FFFDF9 !important;
+  border: 1.5px solid rgba(224, 49, 49, 0.4) !important;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  margin-bottom: 12px;
+}
+.seal-heart-icon .red-heart {
+  font-size: 1.5rem !important;
+  filter: drop-shadow(0 2px 6px rgba(224, 49, 49, 0.45));
+}
+.seal-heart-icon .pure-red-heart-svg {
+  width: 24px;
+  height: 24px;
 }
 .gate-names {
   font-family: var(--font-serif); font-size: 2.4rem; font-weight: 700; color: var(--text-brown); line-height: 1.2;
@@ -450,6 +494,37 @@ body {
   margin-top: 4px;
 }
 
+/* KHỐI LỜI MỜI VINH HẠNH TRƯỚC NÚT XÁC NHẬN */
+.reception-honor-invite {
+  margin: 25px auto 10px;
+  max-width: 480px;
+  padding: 16px 20px;
+  background: rgba(255, 253, 250, 0.65);
+  border-radius: 12px;
+  border: 1px dashed rgba(111, 148, 104, 0.45);
+}
+
+.reception-honor-invite .honor-text {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-brown);
+  line-height: 1.45;
+  margin-bottom: 6px;
+}
+
+.reception-honor-invite .honor-subtext {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.reception-honor-invite .honor-subtext strong {
+  color: var(--btn-brown);
+  font-weight: 700;
+}
+
 .btn-rsvp-pill {
   display: inline-block;
   background: var(--btn-brown);
@@ -470,41 +545,97 @@ body {
 }
 .btn-rsvp-pill:hover { background: var(--btn-hover); transform: translateY(-1px); }
 
-/* --- KHUNG LỊCH THÁNG 12/2026 --- */
+/* --- KHUNG LỊCH THÁNG 12/2026 MỚI: VIỀN ĐÔI TINH TẾ & TRÁI TIM ĐỎ --- */
 .calendar-box-container {
   position: relative;
   max-width: 380px;
-  margin: 25px auto 15px;
-  padding: 30px 20px;
-  border: 1px solid var(--border-soft);
-  background: rgba(243, 247, 240, 0.85) !important;
+  margin: 30px auto 18px;
+  padding: 8px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 10px 30px rgba(45, 66, 48, 0.08);
 }
-.cal-corner {
-  position: absolute; width: 30px; height: 30px; border: 2px solid var(--btn-brown); opacity: 0.6;
+
+.calendar-inner-frame {
+  border: 1.5px solid rgba(111, 148, 104, 0.35);
+  border-radius: 14px;
+  padding: 24px 18px 20px;
+  background: rgba(243, 247, 240, 0.75);
 }
-.cal-tl { top: -2px; left: -2px; border-right: none; border-bottom: none; border-top-left-radius: 8px;}
-.cal-tr { top: -2px; right: -2px; border-left: none; border-bottom: none; border-top-right-radius: 8px;}
-.cal-bl { bottom: -2px; left: -2px; border-right: none; border-top: none; border-bottom-left-radius: 8px;}
-.cal-br { bottom: -2px; right: -2px; border-left: none; border-top: none; border-bottom-right-radius: 8px;}
 
 .calendar-title-month {
-  font-family: var(--font-sans); font-size: 1.1rem; font-weight: 700; color: var(--text-brown); margin-bottom: 15px;
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-brown);
+  letter-spacing: 0.06em;
+  margin-bottom: 18px;
 }
-.calendar-table { width: 100%; border-collapse: collapse; font-family: var(--font-sans); font-size: 0.9rem; color: var(--text-muted); }
-.calendar-table th { border-top: 1px solid var(--border-soft); border-bottom: 1px solid var(--border-soft); padding: 10px 0; font-weight: 600; text-shadow: none; }
-.calendar-table td { padding: 12px 0; text-align: center; vertical-align: middle; text-shadow: none; }
+
+.calendar-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  color: var(--text-muted);
+}
+
+.calendar-table th {
+  border-top: 1px solid rgba(111, 148, 104, 0.25);
+  border-bottom: 1px solid rgba(111, 148, 104, 0.25);
+  padding: 10px 0;
+  font-weight: 700;
+  color: var(--btn-brown);
+  font-size: 0.85rem;
+}
+
+.calendar-table td {
+  padding: 11px 0;
+  text-align: center;
+  vertical-align: middle;
+  font-weight: 600;
+}
+
+/* NGÀY 12 HÌNH TRÁI TIM ĐỎ ĐẬP NHẸ */
 .calendar-heart-highlight {
-  display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px;
-  background-color: var(--btn-brown); color: #fff; border-radius: 50% 50% 5px 50%;
-  transform: rotate(-45deg); box-shadow: 0 4px 10px rgba(111, 148, 104, 0.4); margin: 0 auto;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 36px;
+  margin: 0 auto;
+  animation: heartPulse 2.4s ease-in-out infinite;
 }
-.calendar-heart-highlight span { transform: rotate(45deg); font-weight: 700; }
-.btn-add-calendar-link {
-  display: inline-block; text-decoration: none; font-family: var(--font-serif);
-  font-size: 1.1rem; color: var(--text-muted); border-bottom: 1px solid var(--text-muted);
-  padding-bottom: 2px; margin-top: 15px; font-weight: 600; transition: all 0.2s;
+
+.heart-svg-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: #D9383A;
+  filter: drop-shadow(0 4px 8px rgba(217, 56, 58, 0.35));
 }
-.btn-add-calendar-link:hover { color: var(--text-brown); border-color: var(--text-brown); }
+
+.heart-day-num {
+  position: relative;
+  z-index: 2;
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #FFFFFF !important;
+  line-height: 1;
+  padding-bottom: 2px;
+}
+
+@keyframes heartPulse {
+  0% { transform: scale(1); }
+  14% { transform: scale(1.12); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.1); }
+  70% { transform: scale(1); }
+  100% { transform: scale(1); }
+}
 
 /* =========================================================
    --- ALBUM ẢNH 3D COVERFLOW CHUẨN 100% THEO FILE MẪU ---

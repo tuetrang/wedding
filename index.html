@@ -26,13 +26,17 @@
   <!-- TICKER LỜI CHÚC (GÓC DƯỚI TRÁI) -->
   <div class="floating-ticker-widget" id="floatingWidget">
     <div class="ticker-header">
-      <span>&#x2764;&#xFE0E; Lời Chúc Phúc</span>
+      <span><span class="red-heart">❤</span> Lời Chúc Phúc</span>
       <button class="ticker-close-btn" id="widgetToggleBtn" title="Thu gọn">✕</button>
     </div>
     <div class="ticker-content-box" id="tickerContentBox"></div>
   </div>
-  <div class="widget-fab-icon" id="widgetFabIcon" title="Xem lời chúc">&#x2764;&#xFE0E;</div>
-
+  <div class="widget-fab-icon" id="widgetFabIcon" title="Xem lời chúc">
+    <svg class="heart-fab-svg" viewBox="0 0 32 29.6">
+      <path d="M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.4,16,21.2,16,21.2s16-11.8,16-21.2C32,3.8,28.2,0,23.6,0z"/>
+    </svg>
+  </div>
+  
   <!-- POP-UP THÔNG BÁO -->
   <div class="custom-alert-overlay" id="customAlert">
     <div class="custom-alert-card">
@@ -52,7 +56,7 @@
   <div id="gateScreen">
     <div class="vintage-envelope-card">
       <div class="gate-inner-content">
-        <div class="seal-heart-icon">&#x2764;&#xFE0E;</div>
+        <div class="seal-heart-icon"><span class="red-heart">❤</span></div>
         <div class="gate-names">
           Nguyễn Tuệ
           <span>&</span>
@@ -201,24 +205,33 @@
 
       <!-- Khung Lịch Tháng 12 / 2026 -->
       <div class="calendar-box-container">
-        <div class="cal-corner cal-tl"></div>
-        <div class="cal-corner cal-tr"></div>
-        <div class="cal-corner cal-bl"></div>
-        <div class="cal-corner cal-br"></div>
-        
-        <div class="calendar-title-month">Tháng 12 / 2026</div>
-        <table class="calendar-table">
-          <thead>
-            <tr><th>T2</th><th>T3</th><th>T4</th><th>T5</th><th>T6</th><th>T7</th><th>CN</th></tr>
-          </thead>
-          <tbody>
-            <tr><td></td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td></tr>
-            <tr><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td><div class="calendar-heart-highlight"><span>12</span></div></td><td>13</td></tr>
-            <tr><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td></tr>
-            <tr><td>21</td><td>22</td><td>23</td><td>24</td><td>25</td><td>26</td><td>27</td></tr>
-            <tr><td>28</td><td>29</td><td>30</td><td>31</td><td></td><td></td><td></td></tr>
-          </tbody>
-        </table>
+        <div class="calendar-inner-frame">
+          <div class="calendar-title-month">Tháng 12 / 2026</div>
+          <table class="calendar-table">
+            <thead>
+              <tr><th>T2</th><th>T3</th><th>T4</th><th>T5</th><th>T6</th><th>T7</th><th>CN</th></tr>
+            </thead>
+            <tbody>
+              <tr><td></td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td></tr>
+              <tr>
+                <td>7</td><td>8</td><td>9</td><td>10</td><td>11</td>
+                <td>
+                  <!-- NGÀY 12 HÌNH TRÁI TIM ĐỎ NỔI BẬT -->
+                  <div class="calendar-heart-highlight">
+                    <svg class="heart-svg-bg" viewBox="0 0 32 29.6">
+                      <path d="M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.4,16,21.2,16,21.2s16-11.8,16-21.2C32,3.8,28.2,0,23.6,0z"/>
+                    </svg>
+                    <span class="heart-day-num">12</span>
+                  </div>
+                </td>
+                <td>13</td>
+              </tr>
+              <tr><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td></tr>
+              <tr><td>21</td><td>22</td><td>23</td><td>24</td><td>25</td><td>26</td><td>27</td></tr>
+              <tr><td>28</td><td>29</td><td>30</td><td>31</td><td></td><td></td><td></td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
       <div>
         <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Ti%E1%BB%87c+C%C6%B0%E1%BB%9Bi+-+Nguy%E1%BB%85n+Tu%E1%BB%87+%26+Di%E1%BB%85m+Trang&dates=20261212T043000Z/20261212T070000Z&details=Ti%E1%BB%87c+m%E1%BB%ABng+t%E1%BA%A1i+GEM+Center&location=GEM+Center,+8+Nguy%E1%BB%85n+B%E1%BB%89nh+Khi%C3%AAm,+Qu%E1%BA%ADn+1" target="_blank" rel="noopener noreferrer" class="btn-add-calendar-link">Thêm vào lịch</a>
