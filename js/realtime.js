@@ -1,4 +1,4 @@
-// --- LẮNG NGHE & CẬP NHẬT REALTIME (TICKER & LỜI CHÚC TRÔI VÒNG LẶP MƯỢT 100%) ---
+// --- LẮNG NGHE & CẬP NHẬT REALTIME (GIỮ NGUYÊN FORMAT GỐC CHUẨN) ---
 let wishesQueue = [];
 let tickerTimer = null;
 let currentWishIndex = 0;
@@ -33,17 +33,9 @@ function startTickerLoop() {
   }, 4000);
 }
 
-// Render danh sách lời chúc và xử lý cảm ứng nhấc tay trôi tiếp
-function refreshWishesDOM() {
-  const container = document.getElementById('infiniteWishesBox');
-  if (!container) return;
-
-  if (wishesQueue.length === 0) {
-    container.innerHTML = '<div style="text-align:center; padding: 24px; color: var(--text-muted); font-size: 0.9rem; font-style: italic;">Chưa có lời chúc nào. Hãy là người đầu tiên gửi lời chúc phúc nhé!</div>';
-    return;
-  }
-
-  const renderCardHTML = (w) => `
+// Render thẻ theo đúng format gốc: Tên trái - Giờ phải - Lời chúc dưới
+function renderCardHTML(w) {
+  return `
     <div class="wish-scroll-card">
       <div class="wish-card-header">
         <span class="wish-author-name">${escapeHTML(w.name)}</span>
@@ -52,14 +44,25 @@ function refreshWishesDOM() {
       <div class="wish-message-body">${escapeHTML(w.message)}</div>
     </div>
   `;
+}
 
+function refreshWishesDOM() {
+  const container = document.getElementById('infiniteWishesBox');
+  if (!container) return;
+
+  if (wishesQueue.length === 0) {
+    container.innerHTML = '<div style="text-align:center; padding: 24px; color: var(--text-muted); font-size: 0.9rem; font-style: italic;">Chưa có lời chúc nào. Hãy là người đầu tiên gửi lời chúc nhé!</div>';
+    return;
+  }
+
+  // Nếu ít lời chúc (1-2 cái): Giữ nguyên, không cuộn loop
   if (wishesQueue.length <= 2) {
     container.innerHTML = `<div class="marquee-static-track">${wishesQueue.map(renderCardHTML).join('')}</div>`;
     return;
   }
 
   const cardsHtml = wishesQueue.map(renderCardHTML).join('');
-  const duration = Math.max(14, wishesQueue.length * 3.8);
+  const duration = Math.max(14, wishesQueue.length * 4);
 
   container.innerHTML = `
     <div class="marquee-wishes-wrapper">
@@ -72,7 +75,7 @@ function refreshWishesDOM() {
     </div>
   `;
 
-  // GẮN SỰ KIỆN CHẠM TAY DỪNG - NHẤC TAY CHẠY TIẾP CHO IPHONE
+  // Chạm giữ dừng đọc, nhả tay trôi tiếp, không bị menu bôi đen chữ
   if (!container.dataset.touchBound) {
     container.dataset.touchBound = "1";
 
@@ -90,7 +93,7 @@ function refreshWishesDOM() {
   }
 }
 
-// Lắng nghe sự kiện realtime từ Firebase
+// Lắng nghe Firebase realtime
 if (typeof wishesRef !== 'undefined' && wishesRef) {
   wishesRef.on('child_added', (snapshot) => {
     const item = snapshot.val();
@@ -99,7 +102,7 @@ if (typeof wishesRef !== 'undefined' && wishesRef) {
     const exists = wishesQueue.some(w => w._key === key);
     if (!exists) {
       item._key = key;
-      wishesQueue.unshift(item);
+      wishesQueue.unshift(item); // Đưa lời chúc mới nhất lên đầu
       refreshWishesDOM();
       startTickerLoop();
     }
