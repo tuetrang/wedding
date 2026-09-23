@@ -1,8 +1,7 @@
-// --- LẮNG NGHE & CẬP NHẬT REALTIME (TICKER & LỜI CHÚC CUỘN VÔ TẬN) ---
+// --- LẮNG NGHE & CẬP NHẬT REALTIME (TICKER & LỜI CHÚC TRÔI VÒNG LẶP MƯỢT 100%) ---
 let wishesQueue = [];
 let tickerTimer = null;
 let currentWishIndex = 0;
-let isLoopBound = false;
 
 function escapeHTML(str) {
   if (!str) return '';
@@ -34,7 +33,7 @@ function startTickerLoop() {
   }, 4000);
 }
 
-// Hàm render toàn bộ danh sách lời chúc kèm cơ chế Infinite Loop Scroll
+// Render danh sách lời chúc tự động trôi vô tận không giật lag
 function refreshWishesDOM() {
   const container = document.getElementById('infiniteWishesBox');
   if (!container) return;
@@ -44,9 +43,8 @@ function refreshWishesDOM() {
     return;
   }
 
-  // Tạo HTML cho từng lời chúc
-  const renderCardHTML = (w, idxKey) => `
-    <div class="wish-scroll-card" data-key="${idxKey}">
+  const renderCardHTML = (w) => `
+    <div class="wish-scroll-card">
       <div class="wish-card-header">
         <span class="wish-author-name">${escapeHTML(w.name)}</span>
         <span class="wish-time-stamp">${escapeHTML(w.time || '')}</span>
@@ -55,40 +53,40 @@ function refreshWishesDOM() {
     </div>
   `;
 
-  // Nếu có từ 3 lời chúc trở lên: Nhân đôi danh sách để tạo chu kỳ vòng tròn vô tận (5, 4, 3, 2, 1 -> 5, 4, 3, 2, 1)
-  let renderList = wishesQueue;
-  if (wishesQueue.length >= 3) {
-    renderList = [...wishesQueue, ...wishesQueue];
+  // Nếu ít lời chúc (1-2 cái): Giữ nguyên, không cuộn
+  if (wishesQueue.length <= 2) {
+    container.innerHTML = `<div class="marquee-static-track">${wishesQueue.map(renderCardHTML).join('')}</div>`;
+    return;
   }
 
-  container.innerHTML = renderList.map((item, idx) => renderCardHTML(item, idx)).join('');
+  // Nếu từ 3 lời chúc trở lên: Dùng track đôi song song (Marquee CSS Animation) trôi vô tận
+  const cardsHtml = wishesQueue.map(renderCardHTML).join('');
+  
+  // Tự động tính thời gian trôi theo số lượng card (mỗi card ~3.8 giây để khách đọc thoải mái)
+  const duration = Math.max(14, wishesQueue.length * 3.8);
 
-  // Cơ chế Infinite Scroll: Khi người dùng cuộn đến đáy chu kỳ 1, tự động lùi cuộn mượt mà không khựng
-  if (wishesQueue.length >= 3 && !isLoopBound) {
-    isLoopBound = true;
-    container.addEventListener('scroll', () => {
-      const halfHeight = container.scrollHeight / 2;
-      if (container.scrollTop >= halfHeight) {
-        container.scrollTop -= halfHeight;
-      } else if (container.scrollTop <= 0) {
-        container.scrollTop += halfHeight;
-      }
-    });
-  }
+  container.innerHTML = `
+    <div class="marquee-wishes-wrapper">
+      <div class="marquee-track" style="animation-duration: ${duration}s;">
+        ${cardsHtml}
+      </div>
+      <div class="marquee-track" aria-hidden="true" style="animation-duration: ${duration}s;">
+        ${cardsHtml}
+      </div>
+    </div>
+  `;
 }
 
-// Lắng nghe sự kiện realtime onChildAdded từ Firebase
+// Lắng nghe sự kiện realtime từ Firebase
 if (typeof wishesRef !== 'undefined' && wishesRef) {
   wishesRef.on('child_added', (snapshot) => {
     const item = snapshot.val();
     const key = snapshot.key;
 
-    // Kiểm tra chống trùng lặp dữ liệu
     const exists = wishesQueue.some(w => w._key === key);
     if (!exists) {
       item._key = key;
-      // Đưa lời chúc mới nhất lên đầu danh sách
-      wishesQueue.unshift(item);
+      wishesQueue.unshift(item); // Đưa lời chúc mới nhất lên đầu danh sách
       refreshWishesDOM();
       startTickerLoop();
     }

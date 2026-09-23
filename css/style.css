@@ -1012,62 +1012,98 @@ body {
   margin: 0;
 }
 
+/* Khung nhìn cố định chiều cao, cắt tràn mượt mà */
 .infinite-wishes-scroll-box {
-  max-height: 420px;
-  overflow-y: auto;
-  padding-right: 6px;
+  height: 380px;
+  max-height: 380px;
+  overflow: hidden;
+  position: relative;
+  border-radius: 14px;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 6%, black 94%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 6%, black 94%, transparent 100%);
+}
+
+.marquee-wishes-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Track trôi liên tục */
+.marquee-track {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  scroll-behavior: auto;
-  -webkit-overflow-scrolling: touch;
+  padding-bottom: 12px;
+  flex-shrink: 0;
+  animation: marqueeScroll linear infinite;
+  will-change: transform;
 }
 
-.infinite-wishes-scroll-box::-webkit-scrollbar {
-  width: 6px;
-}
-.infinite-wishes-scroll-box::-webkit-scrollbar-track {
-  background: rgba(111, 148, 104, 0.1);
-  border-radius: 10px;
-}
-.infinite-wishes-scroll-box::-webkit-scrollbar-thumb {
-  background: #9DBF96;
-  border-radius: 10px;
+/* Khi người dùng chạm tay hoặc rê chuột vào -> DỪNG LẠI ĐỂ ĐỌC */
+.infinite-wishes-scroll-box:hover .marquee-track,
+.infinite-wishes-scroll-box:active .marquee-track {
+  animation-play-state: paused !important;
 }
 
+/* Animation trôi vòng lặp 5 4 3 2 1 liên tục không khựng */
+@keyframes marqueeScroll {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-100%);
+  }
+}
+
+.marquee-static-track {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Thẻ lời chúc sạch sẽ, loại bỏ hoàn toàn đè chữ trên iOS */
 .wish-scroll-card {
   background: var(--card-cream) !important;
   border: 1px solid var(--border-soft);
   border-radius: 14px;
   padding: 16px 20px;
   text-align: left;
-  box-shadow: 0 2px 8px rgba(45, 66, 48, 0.03);
+  box-shadow: 0 3px 10px rgba(45, 66, 48, 0.05);
   position: relative;
   flex-shrink: 0;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
 }
+
 .wish-card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
+
 .wish-author-name {
   font-family: var(--font-serif);
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   font-weight: 700;
   color: var(--btn-brown);
 }
+
 .wish-time-stamp {
   font-family: var(--font-sans);
   font-size: 0.75rem;
   color: var(--text-muted);
   font-weight: 600;
 }
+
 .wish-message-body {
   font-family: var(--font-sans);
   font-size: 0.92rem;
   color: var(--text-main);
   line-height: 1.5;
+  word-break: break-word;
 }
 
 /* =========================================================
