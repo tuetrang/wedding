@@ -985,42 +985,21 @@ body {
 }
 
 /* --- TIÊU ĐỀ LỜI CHÚC ĐÃ NHẬN TINH TẾ & KHUNG CUỘN VÔ HẠN --- */
-.wishes-section-wrapper {
-  margin-top: 35px;
-  text-align: left;
-}
-
-.wishes-header-group {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding-bottom: 12px;
-  margin-bottom: 15px;
-  border-bottom: 1px solid rgba(111, 148, 104, 0.35);
-}
-
-.wishes-icon {
-  font-size: 1.25rem;
-}
-
-.wishes-title {
-  font-family: var(--font-serif);
-  font-size: 1.45rem;
-  color: var(--text-brown);
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  margin: 0;
-}
-
-/* Khung nhìn cố định chiều cao, cắt tràn mượt mà */
+/* --- KHUNG LỜI CHÚC TRÔI VÔ TẬN: CHỐNG CHỌN CHỮ VÀ CHẠY MƯỢT TRÊN SAFARI --- */
 .infinite-wishes-scroll-box {
   height: 380px;
   max-height: 380px;
   overflow: hidden;
   position: relative;
   border-radius: 14px;
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 6%, black 94%, transparent 100%);
-  mask-image: linear-gradient(to bottom, transparent 0%, black 6%, black 94%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%);
+  
+  /* CHẶN HOÀN TOÀN BÔI ĐEN VÀ MENU COPY TRÊN IPHONE */
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  -webkit-touch-callout: none !important;
+  touch-action: pan-y;
 }
 
 .marquee-wishes-wrapper {
@@ -1029,7 +1008,6 @@ body {
   height: 100%;
 }
 
-/* Track trôi liên tục */
 .marquee-track {
   display: flex;
   flex-direction: column;
@@ -1040,13 +1018,12 @@ body {
   will-change: transform;
 }
 
-/* Khi người dùng chạm tay hoặc rê chuột vào -> DỪNG LẠI ĐỂ ĐỌC */
+/* Dừng khi rê chuột (PC) hoặc khi JS thêm class .paused (điện thoại) */
 .infinite-wishes-scroll-box:hover .marquee-track,
-.infinite-wishes-scroll-box:active .marquee-track {
+.infinite-wishes-scroll-box.is-paused .marquee-track {
   animation-play-state: paused !important;
 }
 
-/* Animation trôi vòng lặp 5 4 3 2 1 liên tục không khựng */
 @keyframes marqueeScroll {
   0% {
     transform: translateY(0);
@@ -1056,13 +1033,6 @@ body {
   }
 }
 
-.marquee-static-track {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-/* Thẻ lời chúc sạch sẽ, loại bỏ hoàn toàn đè chữ trên iOS */
 .wish-scroll-card {
   background: var(--card-cream) !important;
   border: 1px solid var(--border-soft);
@@ -1075,35 +1045,10 @@ body {
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   transform: translateZ(0);
-}
-
-.wish-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 6px;
-}
-
-.wish-author-name {
-  font-family: var(--font-serif);
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--btn-brown);
-}
-
-.wish-time-stamp {
-  font-family: var(--font-sans);
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  font-weight: 600;
-}
-
-.wish-message-body {
-  font-family: var(--font-sans);
-  font-size: 0.92rem;
-  color: var(--text-main);
-  line-height: 1.5;
-  word-break: break-word;
+  
+  /* Chặn chọn chữ trên từng thẻ */
+  -webkit-user-select: none !important;
+  user-select: none !important;
 }
 
 /* =========================================================

@@ -33,7 +33,7 @@ function startTickerLoop() {
   }, 4000);
 }
 
-// Render danh sách lời chúc tự động trôi vô tận không giật lag
+// Render danh sách lời chúc và xử lý cảm ứng nhấc tay trôi tiếp
 function refreshWishesDOM() {
   const container = document.getElementById('infiniteWishesBox');
   if (!container) return;
@@ -53,16 +53,12 @@ function refreshWishesDOM() {
     </div>
   `;
 
-  // Nếu ít lời chúc (1-2 cái): Giữ nguyên, không cuộn
   if (wishesQueue.length <= 2) {
     container.innerHTML = `<div class="marquee-static-track">${wishesQueue.map(renderCardHTML).join('')}</div>`;
     return;
   }
 
-  // Nếu từ 3 lời chúc trở lên: Dùng track đôi song song (Marquee CSS Animation) trôi vô tận
   const cardsHtml = wishesQueue.map(renderCardHTML).join('');
-  
-  // Tự động tính thời gian trôi theo số lượng card (mỗi card ~3.8 giây để khách đọc thoải mái)
   const duration = Math.max(14, wishesQueue.length * 3.8);
 
   container.innerHTML = `
@@ -75,6 +71,23 @@ function refreshWishesDOM() {
       </div>
     </div>
   `;
+
+  // GẮN SỰ KIỆN CHẠM TAY DỪNG - NHẤC TAY CHẠY TIẾP CHO IPHONE
+  if (!container.dataset.touchBound) {
+    container.dataset.touchBound = "1";
+
+    container.addEventListener('touchstart', () => {
+      container.classList.add('is-paused');
+    }, { passive: true });
+
+    container.addEventListener('touchend', () => {
+      container.classList.remove('is-paused');
+    }, { passive: true });
+
+    container.addEventListener('touchcancel', () => {
+      container.classList.remove('is-paused');
+    }, { passive: true });
+  }
 }
 
 // Lắng nghe sự kiện realtime từ Firebase
@@ -86,7 +99,7 @@ if (typeof wishesRef !== 'undefined' && wishesRef) {
     const exists = wishesQueue.some(w => w._key === key);
     if (!exists) {
       item._key = key;
-      wishesQueue.unshift(item); // Đưa lời chúc mới nhất lên đầu danh sách
+      wishesQueue.unshift(item);
       refreshWishesDOM();
       startTickerLoop();
     }
