@@ -4,12 +4,12 @@
   --text-brown: #263b2b;       /* Màu xanh rêu đậm chuẩn từ Main 2 */
   --text-main: #263b2b;
   --text-muted: #3f5945;
-  --btn-brown: #263b2b;        /* Màu chủ đạo cho nút và tiêu đề */
+  --btn-brown: #263b2b;
   --btn-hover: #1b2a1f;
   --btn-navy: #263b2b;
   --btn-navy-hover: #1b2a1f;
   --border-soft: rgba(38, 59, 43, 0.25);
-  /* Bộ font thiệp cưới: Lora + Montserrat */
+  
   --font-lora: 'Lora', serif;
   --font-serif: 'Lora', serif;
   --font-sans: 'Lora', serif;
@@ -26,7 +26,7 @@ body {
   overflow-x: hidden;
 }
 
-/* --- ÉP TRÁI TIM ĐỎ RỰC TRÊN TẤT CẢ THIẾT BỊ (IOS, ANDROID, WEB) --- */
+/* --- ÉP TRÁI TIM ĐỎ RỰC TRÊN TẤT CẢ THIẾT BỊ --- */
 .red-heart {
   color: #E03131 !important;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Emoji", "Apple Color Emoji", sans-serif !important;
@@ -44,7 +44,7 @@ body {
   filter: drop-shadow(0 2px 4px rgba(224, 49, 49, 0.4)) !important;
 }
 
-/* --- Fixed music button --- */
+/* --- NÚT BẬT/TẮT NHẠC (MUSIC BUTTON) --- */
 .music-btn {
   position: fixed !important;
   bottom: 24px !important;
@@ -86,23 +86,48 @@ body {
 
 /* --- TICKER LỜI CHÚC GÓC DƯỚI TRÁI --- */
 .floating-ticker-widget {
-  position: fixed; bottom: 24px; left: 20px; z-index: 900;
-  max-width: 320px; width: 100%; 
+  position: fixed;
+  bottom: 24px;
+  left: 20px;
+  z-index: 900;
+  max-width: 290px;             /* Cố định không tràn sang phải đè nút nhạc */
+  width: calc(100% - 95px);    /* Chừa chỗ an toàn cho nút tròn góc phải */
   background: rgba(38, 59, 43, 0.95);
   backdrop-filter: blur(10px); 
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px; padding: 12px 14px; color: #fff; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  border-radius: 12px;
+  padding: 12px 14px;
+  color: #fff;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
   transition: all 0.3s ease;
 }
-.floating-ticker-widget.minimized { opacity: 0; transform: scale(0.8) translateY(20px); pointer-events: none; }
+.floating-ticker-widget.minimized {
+  opacity: 0;
+  transform: scale(0.8) translateY(20px);
+  pointer-events: none;
+}
 .ticker-header {
-  display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;
-  font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; color: #E2EFE0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15); padding-bottom: 4px; font-weight: 700;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  font-size: 0.72rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #E2EFE0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  padding-bottom: 4px;
+  font-weight: 700;
 }
 .ticker-close-btn { 
-  background: none; border: none; color: #fff; cursor: pointer; font-size: 1rem; 
-  padding: 0 4px; line-height: 1; transition: color 0.2s;
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1rem; 
+  padding: 0 4px;
+  line-height: 1;
+  transition: color 0.2s;
 }
 .ticker-close-btn:hover { color: #E2EFE0; }
 .ticker-content-box { min-height: 42px; display: flex; align-items: center; overflow: hidden; }
@@ -117,11 +142,19 @@ body {
 
 /* NÚT TRÒN GÓC DƯỚI TRÁI (#widgetFabIcon) */
 .widget-fab-icon {
-  position: fixed; bottom: 24px; left: 20px; width: 44px; height: 44px;
+  position: fixed;
+  bottom: 24px;
+  left: 20px;
+  width: 44px;
+  height: 44px;
   background: #FFFFFF !important;
   border: 1.5px solid rgba(224, 49, 49, 0.4) !important;
   border-radius: 50%;
-  display: none; align-items: center; justify-content: center; cursor: pointer; z-index: 901;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 901;
   box-shadow: 0 4px 15px rgba(224, 49, 49, 0.25) !important;
 }
 .widget-fab-icon .red-heart {
@@ -250,7 +283,7 @@ body {
 }
 
 /* =========================================================
-   1 & 2. POSTER SECTIONS: SAVE THE DATE & THÔNG TIN LỄ CƯỚI
+   POSTER SECTIONS: SAVE THE DATE & THÔNG TIN LỄ CƯỚI (ẢNH)
    ========================================================= */
 .poster-section {
   width: 100%;
@@ -259,6 +292,8 @@ body {
   margin: 0;
   padding: 0;
   background: #FFF;
+  border: none !important;
+  outline: none !important;
 }
 
 .full-poster-img {
@@ -266,54 +301,95 @@ body {
   height: auto;
   display: block;
   object-fit: cover;
+  border: none !important;
 }
 
 /* =========================================================
-   3. CÁC SECTION DÙNG BACKGROUND MỚI: SECTION 1, 2, 3
+   4 SECTION TRẢI ĐỀU 4 ẢNH NỀN LIÊN TỤC (XÓA TRIỆT ĐỂ VẠCH KẺ)
    ========================================================= */
 
-/* 2. ALBUM SECTION (BACKGROUND: section 1) */
+/* 1. ALBUM SECTION  */
 .album-section {
-  padding: 50px 0 40px 0;
-  background-image: url('../image/album.png') !important;
-  background-size: cover;
-  background-position: center top;
-  background-repeat: no-repeat;
-  overflow: hidden;
-}
-
-/* 3. SECTION TIỆC CƯỚI & COUNTDOWN (BACKGROUND: section 2) */
-.reception-details-section {
-  padding: 45px 20px;
-  text-align: center;
-  background-image: url('../image/section%202.png') !important;
-  background-size: cover;
-  background-position: center top;
-  background-repeat: no-repeat;
-}
-
-/* 4. PHẦN ĐỊA ĐIỂM HÔN LỄ & LỜI CHÚC (BACKGROUND: section 3) */
-.extra-section {
-  padding: 40px 20px 20px 20px; 
-  background-image: url('../image/section%203.png') !important;
-  background-size: cover;
-  background-position: center top;
-  background-repeat: no-repeat;
-  text-align: center;
-}
-
-/* TYPOGRAPHY CHO CÁC PHẦN DƯỚI */
-.album-container {
   width: 100%;
   max-width: 680px;
   margin: 0 auto;
+  padding: 65px 20px 60px 20px;
+  background-image: url('../image/album.png') !important;
+  background-size: 100% 100% !important; /* Phủ kín không chừa mép */
+  background-position: center top !important;
+  background-repeat: no-repeat !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  border: none !important;
+  outline: none !important;
+  margin-top: -1px; /* Khử triệt để đường line trắng giữa 2 section */
+}
+
+/* 2. SECTION TIỆC CƯỚI & COUNTDOWN */
+.reception-details-section {
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 60px 20px 50px 20px;
+  text-align: center;
+  background-image: url('../image/section 1.png') !important;
+  background-size: 100% 100% !important;
+  background-position: center top !important;
+  background-repeat: no-repeat !important;
+  border: none !important;
+  outline: none !important;
+  margin-top: -1px; /* Khử vạch kẻ nối */
+}
+
+/* 3. SECTION ĐỊA ĐIỂM & RSVP FORM  */
+.location-rsvp-section {
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 55px 20px 45px 20px; 
+  background-image: url('../image/section 2.png') !important;
+  background-size: 100% 100% !important;
+  background-position: center top !important;
+  background-repeat: no-repeat !important;
+  text-align: center;
+  border: none !important;
+  outline: none !important;
+  margin-top: -1px; /* Khử vạch kẻ trắng giữa section 1 và 2 */
+}
+
+/* 4. SECTION LỜI CHÚC & QUÀ MỪNG & FOOTER */
+.wishes-gift-section {
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 50px 20px 30px 20px; 
+  background-image: url('../image/section 3.png') !important;
+  background-size: 100% 100% !important;
+  background-position: center top !important;
+  background-repeat: no-repeat !important;
+  text-align: center;
+  border: none !important;
+  outline: none !important;
+  margin-top: -1px; /* Khử vạch kẻ nối */
+}
+
+/* TYPOGRAPHY CHO ALBUM ẢNH */
+.album-container {
+  width: 100%;
+  max-width: 580px;
+  margin: 0 auto;
   text-align: center;
   position: relative;
+  z-index: 2;
 }
 
 .album-heading {
   font-family: var(--font-lora);
-  font-size: 1.8rem;
+  font-size: 2.1rem;
   letter-spacing: 0.28em;
   text-transform: uppercase;
   color: #263b2b !important;
@@ -324,11 +400,11 @@ body {
 .coverflow-wrapper {
   position: relative;
   width: 100%;
-  height: 430px;
+  height: 380px;
   display: flex;
   align-items: center;
   justify-content: center;
-  perspective: 1000px;
+  perspective: 900px;
   user-select: none;
 }
 
@@ -344,12 +420,12 @@ body {
 
 .coverflow-card {
   position: absolute;
-  width: 250px;
-  height: 370px;
-  border-radius: 18px;
+  width: 220px;
+  height: 330px;
+  border-radius: 16px;
   overflow: hidden;
   background: #FFF;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.16);
+  box-shadow: 0 15px 32px rgba(0, 0, 0, 0.16);
   cursor: pointer;
   transition: transform 0.65s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.65s ease, filter 0.65s ease, box-shadow 0.65s ease;
   will-change: transform, opacity;
@@ -369,30 +445,30 @@ body {
   z-index: 10;
   opacity: 1;
   filter: brightness(1);
-  box-shadow: 0 22px 50px rgba(0, 0, 0, 0.22);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.2);
 }
 
 .coverflow-card.prev-1 {
-  transform: translateX(-145px) scale(0.86) rotateY(42deg);
+  transform: translateX(-130px) scale(0.86) rotateY(40deg);
   z-index: 6;
   opacity: 0.88;
   filter: brightness(0.96);
 }
 .coverflow-card.next-1 {
-  transform: translateX(145px) scale(0.86) rotateY(-42deg);
+  transform: translateX(130px) scale(0.86) rotateY(-40deg);
   z-index: 6;
   opacity: 0.88;
   filter: brightness(0.96);
 }
 
 .coverflow-card.prev-2 {
-  transform: translateX(-240px) scale(0.72) rotateY(55deg);
+  transform: translateX(-215px) scale(0.72) rotateY(52deg);
   z-index: 2;
   opacity: 0.65;
   filter: brightness(0.9);
 }
 .coverflow-card.next-2 {
-  transform: translateX(240px) scale(0.72) rotateY(-55deg);
+  transform: translateX(215px) scale(0.72) rotateY(-52deg);
   z-index: 2;
   opacity: 0.65;
   filter: brightness(0.9);
@@ -436,7 +512,7 @@ body {
   justify-content: center;
   align-items: center;
   gap: 7px;
-  margin-top: 15px;
+  margin-top: 20px;
 }
 .dot-item {
   width: 7px;
@@ -452,18 +528,7 @@ body {
   background: #263b2b !important;
 }
 
-@media (max-width: 480px) {
-  .coverflow-wrapper { height: 360px; perspective: 700px; }
-  .coverflow-card { width: 190px; height: 290px; border-radius: 14px; }
-  .coverflow-card.prev-1 { transform: translateX(-95px) scale(0.85) rotateY(40deg); }
-  .coverflow-card.next-1 { transform: translateX(95px) scale(0.85) rotateY(-40deg); }
-  .coverflow-card.prev-2 { transform: translateX(-160px) scale(0.7) rotateY(50deg); }
-  .coverflow-card.next-2 { transform: translateX(160px) scale(0.7) rotateY(-50deg); }
-  .btn-prev { left: 12px; }
-  .btn-next { right: 12px; }
-}
-
-/* KHUNG PHÓNG TO ẢNH */
+/* KHUNG PHÓNG TO ẢNH (LIGHTBOX MODAL) */
 .lightbox-modal {
   position: fixed !important;
   inset: 0 !important;
@@ -511,43 +576,44 @@ body {
 }
 
 /* =========================================================
-   PHẦN TIỆC CƯỚI: ĐỒNG BỘ 100% THEO FONT LORA VÀ MÀU #263b2b
+   PHẦN TIỆC CƯỚI: ĐỒNG BỘ 100% CỠ CHỮ & ĐỘ ĐẬM THEO ẢNH MAIN 2
    ========================================================= */
 .reception-header-title {
   font-family: var(--font-lora) !important;
-  font-size: 1.55rem !important;
-  letter-spacing: 0.22em !important;
+  font-size: 2.1rem !important;
+  letter-spacing: 0.18em !important;
   text-transform: uppercase !important;
   color: #263b2b !important;
   font-weight: 700 !important;
-  margin-bottom: 8px !important;
+  margin-bottom: 6px !important;
 }
 
 .reception-header-sub {
   font-family: var(--font-lora) !important;
-  font-size: 1.15rem !important;
-  letter-spacing: 0.15em !important;
+  font-size: 1.5rem !important;
+  letter-spacing: 0.14em !important;
   text-transform: uppercase !important;
   color: #263b2b !important;
-  font-weight: 600 !important;
-  margin-bottom: 18px !important;
+  font-weight: 200 !important;
+  margin-bottom: 12px !important;
 }
 
 .reception-main-time {
   font-family: var(--font-lora) !important;
-  font-size: 3rem !important;
+  font-size: 2.6rem !important;
   color: #263b2b !important;
   font-weight: 700 !important;
-  line-height: 1 !important;
-  margin-bottom: 16px !important;
+  line-height: 1.1 !important;
+  margin-bottom: 12px !important;
 }
 
+/* Khối Ngày Tháng có 2 gạch đứng */
 .date-display-box {
-  margin: 15px auto 10px !important;
+  margin: 12px auto 10px !important;
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
-  gap: 16px !important;
+  gap: 14px !important;
   font-family: var(--font-lora) !important;
   color: #263b2b !important;
   white-space: nowrap !important;
@@ -556,19 +622,19 @@ body {
 .date-display-box .day-text,
 .date-display-box .month-text {
   font-family: var(--font-lora) !important;
-  font-size: 1.05rem !important;
-  letter-spacing: 0.12em !important;
-  text-transform: uppercase !important;
-  font-weight: 600 !important;
+  font-size: 1.65rem !important;
+  letter-spacing: 0.1em !important;
+  font-weight: 700 !important;
   color: #263b2b !important;
+  text-transform: uppercase !important;
 }
 
 .date-display-box .day-number {
   font-family: var(--font-lora) !important;
-  font-size: 3.4rem !important;
+  font-size: 2.8rem !important;
   font-weight: 700 !important;
   line-height: 1 !important;
-  padding: 0 16px !important;
+  padding: 0 14px !important;
   color: #263b2b !important;
   border-left: 2px solid #263b2b !important;
   border-right: 2px solid #263b2b !important;
@@ -576,44 +642,48 @@ body {
 
 .year-display {
   font-family: var(--font-lora) !important;
-  font-size: 2.2rem !important;
+  font-size: 2.6rem !important;
   font-weight: 700 !important;
   color: #263b2b !important;
-  letter-spacing: 0.15em !important;
+  letter-spacing: 0.12em !important;
   margin: 6px 0 !important;
 }
 
+/* ĐỒNG BỘ DÒNG ÂM LỊCH */
 .lunar-date {
   font-family: var(--font-lora) !important;
-  font-size: 0.95rem !important;
-  font-weight: 500 !important;
-  color: #3f5945 !important;
-  font-style: italic !important;
-  letter-spacing: 0.05em !important;
+  font-size: 1.65rem !important;
+  font-weight: 200 !important;
+  color: #263b2b !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  margin-bottom: 25px !important;
+  display: block !important;
 }
 
+/* ĐÓN KHÁCH & KHAI TIỆC */
 .timeline-schedule-box {
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
-  gap: 50px !important;
-  margin: 28px 0 20px !important;
+  gap: 40px !important;
+  margin: 24px 0 20px !important;
 }
 
 .timeline-item-col small {
   display: block !important;
   font-family: var(--font-lora) !important;
-  font-size: 0.88rem !important;
-  letter-spacing: 0.16em !important;
+  font-size: 1.65rem !important;
+  letter-spacing: 0.15em !important;
   text-transform: uppercase !important;
   color: #263b2b !important;
   font-weight: 700 !important;
-  margin-bottom: 6px !important;
+  margin-bottom: 4px !important;
 }
 
 .timeline-item-col span {
   font-family: var(--font-lora) !important;
-  font-size: 1.45rem !important;
+  font-size: 1.65rem !important;
   color: #263b2b !important;
   font-weight: 700 !important;
 }
@@ -637,7 +707,7 @@ body {
 
 .countdown-number {
   font-family: var(--font-lora) !important;
-  font-size: 1.85rem !important;
+  font-size: 1.7rem !important;
   font-weight: 700 !important;
   color: #263b2b !important;
   line-height: 1.1;
@@ -645,7 +715,7 @@ body {
 
 .countdown-label {
   font-family: var(--font-lora) !important;
-  font-size: 0.75rem !important;
+  font-size: 1rem !important;
   letter-spacing: 0.15em !important;
   text-transform: uppercase !important;
   font-weight: 700 !important;
@@ -688,7 +758,7 @@ body {
   display: inline-block;
   text-decoration: none;
   font-family: var(--font-lora);
-  font-size: 0.82rem;
+  font-size: 1.2rem;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -713,7 +783,7 @@ body {
   padding: 13px 45px;
   border-radius: 30px;
   font-family: var(--font-lora);
-  font-size: 0.9rem;
+  font-size: 1.3rem;
   font-weight: 700;
   letter-spacing: 0.15em;
   text-transform: uppercase;
@@ -728,7 +798,7 @@ body {
 /* KHUNG LỊCH THÁNG 12/2026 */
 .calendar-box-container {
   position: relative;
-  max-width: 380px;
+  max-width: 400px;
   margin: 30px auto 18px;
   padding: 8px;
   border-radius: 18px;
@@ -743,7 +813,7 @@ body {
 }
 .calendar-title-month {
   font-family: var(--font-lora);
-  font-size: 1.35rem;
+  font-size: 1.65rem;
   font-weight: 700;
   color: #263b2b;
   letter-spacing: 0.06em;
@@ -753,20 +823,21 @@ body {
   width: 100%;
   border-collapse: collapse;
   font-family: var(--font-lora);
-  font-size: 0.92rem;
+  font-size: 1.92rem;
   color: #3f5945;
 }
 .calendar-table th {
   padding: 10px 0;
   font-weight: 700;
   color: #263b2b;
-  font-size: 0.85rem;
+  font-size: 1.4rem;
 }
 .calendar-table td {
   padding: 11px 0;
   text-align: center;
   vertical-align: middle;
   font-weight: 600;
+  font-size: 1rem;
 }
 .calendar-heart-highlight {
   position: relative;
@@ -805,10 +876,17 @@ body {
   100% { transform: scale(1); }
 }
 
-/* KHỐI ĐỊA ĐIỂM HÔN LỄ & LỜI CHÚC */
+/* =========================================================
+   ĐỊA ĐIỂM & RSVP (NỀN 3)
+   ========================================================= */
 .extra-section-title {
-  font-family: var(--font-lora); font-size: 1.4rem; color: #263b2b;
-  margin-bottom: 30px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
+  font-family: var(--font-lora);
+  font-size: 2.1rem;
+  color: #263b2b;
+  margin-bottom: 30px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
 }
 .event-box {
   background: var(--card-cream) !important; 
@@ -827,13 +905,12 @@ body {
 }
 .btn-sub-action:hover { background: #263b2b; color: #fff; }
 
-/* FORM XÁC NHẬN THAM DỰ */
 .rsvp-form-card {
   background: var(--card-cream) !important;
   border: 1px solid var(--border-soft);
   border-radius: 20px;
   padding: 35px 24px;
-  margin: 25px 0;
+  margin: 25px 0 10px 0;
   box-shadow: 0 10px 30px rgba(38, 59, 43, 0.05);
   text-align: left;
 }
@@ -928,9 +1005,11 @@ body {
   cursor: not-allowed;
 }
 
-/* LỜI CHÚC ĐÃ NHẬN */
+/* =========================================================
+   LỜI CHÚC & QUÀ MỪNG & FOOTER (NỀN 4)
+   ========================================================= */
 .wishes-section-wrapper {
-  margin-top: 35px;
+  margin-top: 10px;
   text-align: left;
 }
 .wishes-header-group {
@@ -1111,9 +1190,9 @@ body {
   50% { opacity: 0.45; }
 }
 
-/* FOOTER ĐỒNG BỘ 100% NỀN VỚI SECTION 3 */
+/* FOOTER ĐỒNG BỘ NỀN VỚI SECTION 4 (KHÔNG GẠCH CHẤM) */
 .wedding-footer {
-  padding: 35px 15px 25px;
+  padding: 35px 15px 20px;
   text-align: center;
   font-family: var(--font-lora);
   font-size: 0.88rem;
@@ -1121,11 +1200,11 @@ body {
   font-weight: 700;
   letter-spacing: 0.12em;
   background: transparent !important;
-  border-top: 1px dashed rgba(38, 59, 43, 0.35);
-  margin-top: 35px;
+  border-top: none !important;
+  margin-top: 25px;
 }
 
-/* MODAL QR (CHUẨN 2 CỘT GỌN GÀNG) */
+/* MODAL QR (CHUẨN 2 CỘT) */
 .qr-modal-overlay {
   position: fixed !important; 
   inset: 0 !important; 
@@ -1278,14 +1357,112 @@ body {
   fill: currentColor !important;
 }
 
+/* =========================================================
+   RESPONSIVE HOÀN THIỆN CHO MÀN HÌNH ĐIỆN THOẠI (< 480PX)
+   ========================================================= */
 @media (max-width: 480px) {
-  .date-display-box { gap: 10px; }
-  .date-display-box .day-number { font-size: 2.3rem; padding: 0 10px; }
-  .date-display-box .day-text, .date-display-box .month-text { font-size: 0.8rem; }
-  .form-row-dual { grid-template-columns: 1fr; gap: 12px; }
-  .timeline-schedule-box { gap: 20px; }
-  .countdown-number { font-size: 1.35rem; }
-  .countdown-label { font-size: 0.65rem; }
-  .qr-modal-body { grid-template-columns: 1fr !important; gap: 25px !important; }
-  .qr-image-frame { max-width: 190px !important; }
+  /* Khung và lề section */
+  .wrapper { width: 100% !important; max-width: 100% !important; }
+  .album-section { padding: 45px 12px 35px 12px !important; margin-top: -1px !important; }
+  .reception-details-section { padding: 45px 12px 40px 12px !important; margin-top: -1px !important; }
+  .location-rsvp-section { padding: 45px 12px 35px 12px !important; margin-top: -1px !important; }
+  .wishes-gift-section { padding: 40px 12px 25px 12px !important; margin-top: -1px !important; }
+
+  /* Tiêu đề chính các section */
+  .album-heading { font-size: 1.6rem !important; letter-spacing: 0.2em !important; margin-bottom: 18px !important; }
+  .extra-section-title { font-size: 1.6rem !important; letter-spacing: 0.15em !important; margin-bottom: 20px !important; }
+  .gift-box-title { font-size: 1.6rem !important; letter-spacing: 0.15em !important; margin-bottom: 18px !important; }
+
+  /* Album Coverflow Mobile */
+  .coverflow-wrapper { height: 310px !important; perspective: 700px !important; }
+  .coverflow-card { width: 175px !important; height: 260px !important; border-radius: 12px !important; }
+  .coverflow-card.prev-1 { transform: translateX(-80px) scale(0.85) rotateY(35deg) !important; }
+  .coverflow-card.next-1 { transform: translateX(80px) scale(0.85) rotateY(-35deg) !important; }
+  .coverflow-card.prev-2 { transform: translateX(-140px) scale(0.7) rotateY(45deg) !important; }
+  .coverflow-card.next-2 { transform: translateX(140px) scale(0.7) rotateY(-45deg) !important; }
+  .btn-prev { left: 8px !important; }
+  .btn-next { right: 8px !important; }
+
+  /* Section Tiệc Cưới: Tinh chỉnh font size mobile vừa vặn */
+  .reception-header-title { font-size: 1.45rem !important; letter-spacing: 0.15em !important; margin-bottom: 6px !important; }
+  .reception-header-sub { font-size: 1.05rem !important; letter-spacing: 0.1em !important; margin-bottom: 10px !important; }
+  .reception-main-time { font-size: 2.3rem !important; margin-bottom: 8px !important; }
+  
+  .date-display-box { gap: 10px !important; margin: 8px auto !important; }
+  .date-display-box .day-text,
+  .date-display-box .month-text { font-size: 1.1rem !important; }
+  .date-display-box .day-number { font-size: 2.2rem !important; padding: 0 10px !important; }
+  .year-display { font-size: 1.9rem !important; margin: 4px 0 !important; }
+  .lunar-date { font-size: 1.05rem !important; margin-bottom: 18px !important; }
+
+  /* Timeline đón khách & khai tiệc */
+  .timeline-schedule-box { gap: 25px !important; margin: 18px 0 16px !important; }
+  .timeline-item-col small { font-size: 1.05rem !important; margin-bottom: 3px !important; }
+  .timeline-item-col span { font-size: 1.25rem !important; }
+
+  /* Countdown timer */
+  .countdown-container { gap: 8px !important; padding: 0 4px !important; margin: 18px auto !important; }
+  .countdown-card { padding: 10px 4px !important; border-radius: 10px !important; }
+  .countdown-number { font-size: 1.35rem !important; }
+  .countdown-label { font-size: 0.75rem !important; }
+
+  /* Khung Lịch Tháng 12 */
+  .calendar-box-container { max-width: 100% !important; margin: 22px auto 15px !important; }
+  .calendar-inner-frame { padding: 18px 12px 16px !important; }
+  .calendar-title-month { font-size: 1.25rem !important; margin-bottom: 14px !important; }
+  .calendar-table th { font-size: 1.05rem !important; padding: 8px 0 !important; }
+  .calendar-table td { font-size: 0.95rem !important; padding: 9px 0 !important; }
+
+  /* Nút thêm lịch & RSVP */
+  .btn-add-calendar-link { font-size: 0.88rem !important; padding: 8px 20px !important; }
+  .btn-rsvp-pill { font-size: 0.95rem !important; padding: 12px 35px !important; }
+
+  /* Form & Bản đồ */
+  .rsvp-form-card { padding: 25px 16px !important; margin: 18px 0 10px 0 !important; }
+  .rsvp-form-title { font-size: 1.55rem !important; }
+  .form-row-dual { grid-template-columns: 1fr !important; gap: 12px !important; }
+  .map-frame-container { height: 190px !important; }
+
+  /* Modal QR 2 người */
+  .qr-modal-body { grid-template-columns: 1fr !important; gap: 22px !important; padding: 18px 15px 22px !important; }
+  .qr-image-frame { max-width: 180px !important; }
+
+  /* FIX LỖI ĐÈ NHAU: Thu gọn widget Lời Chúc và tách riêng nút Nhạc */
+  .floating-ticker-widget {
+    bottom: 16px !important;
+    left: 12px !important;
+    max-width: 260px !important;
+    width: calc(100vw - 85px) !important; /* Dừng cách lề phải 85px để nút nhạc có chỗ đứng riêng */
+    padding: 10px 12px !important;
+  }
+  .ticker-slide-item {
+    font-size: 0.8rem !important;
+  }
+  .widget-fab-icon {
+    bottom: 16px !important;
+    left: 12px !important;
+  }
+  .music-btn {
+    bottom: 16px !important;
+    right: 12px !important;
+    width: 44px !important;
+    height: 44px !important;
+    font-size: 1.1rem !important;
+  }
+  /* Thu gọn dòng âm lịch vừa vặn, không bị bè ngang */
+  .lunar-date {
+    font-size: 0.88rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.03em !important;
+    margin-bottom: 20px !important;
+    padding: 0 10px !important;
+  }
+
+  /* Nút thêm vào lịch nét và dễ bấm hơn */
+  .btn-add-calendar-link {
+    font-size: 0.85rem !important;
+    font-weight: 700 !important;
+    border: 1.5px solid #263b2b !important;
+    padding: 8px 22px !important;
+  }
 }
