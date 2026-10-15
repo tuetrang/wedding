@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests; default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;">
   <title>Thông Tin Lễ Cưới | Nguyễn Tuệ & Diễm Trang</title>
-
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Montserrat:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet" />
@@ -75,19 +74,23 @@
   </div>
 
   <!-- GIAO DIỆN CHÍNH -->
- <!-- GIAO DIỆN CHÍNH -->
+  <!-- GIAO DIỆN CHÍNH -->
   <div class="wrapper">
-    <!-- 0. SAVE THE DATE (THAY BẰNG ẢNH MAIN 1) -->
+    <!-- 0. SAVE THE DATE (POSTER 1) -->
     <section class="poster-section save-the-date-poster">
       <img src="./image/Main 1.png" alt="Save The Date - Nguyễn Tuệ & Diễm Trang" class="full-poster-img" />
     </section>
 
-    <!-- 1. THÔNG TIN LỄ CƯỚI (THAY BẰNG ẢNH MAIN 2) -->
+    <!-- 1. THÔNG TIN LỄ CƯỚI (POSTER 2) -->
     <section class="poster-section invitation-poster">
       <img src="./image/Main 2.png" alt="Thông Tin Lễ Cưới - Nguyễn Tuệ & Diễm Trang" class="full-poster-img" />
     </section>
 
-    <!-- 2. ALBUM ẢNH 3D COVERFLOW (GIỮ NGUYÊN CODE, THAY NỀN SECTION 1) -->
+    <!-- =========================================================
+         BẮT ĐẦU 4 NỀN TRẢI ĐỀU NHAU TỪ ĐÂY
+         ========================================================= -->
+
+    <!-- NỀN 1: ALBUM ẢNH 3D (DÙNG Album.jpg) -->
     <div class="album-section">
       <div class="album-container">
         <h2 class="album-heading">ALBUM ẢNH</h2>
@@ -119,14 +122,14 @@
       </div>
     </div>
 
-    <!-- 3. THÔNG TIN TIỆC CƯỚI & COUNTDOWN (GIỮ NGUYÊN CODE, THAY NỀN SECTION 2) -->
+    <!-- NỀN 2: THÔNG TIN TIỆC CƯỚI & COUNTDOWN (DÙNG section 1.jpg) -->
     <div class="reception-details-section">
       <div class="reception-header-title">THÔNG TIN TIỆC CƯỚI</div>
       <div class="reception-header-sub">TIỆC CƯỚI SẼ DIỄN RA VÀO LÚC:</div>
 
-      <div class="reception-main-time">11:30</div>
+      <div class="reception-main-time">12:00</div>
 
-      <div class="date-display-box" style="margin: 15px auto 10px;">
+      <div class="date-display-box">
         <span class="day-text">Thứ Bảy</span>
         <span class="day-number">12</span>
         <span class="month-text">Tháng 12</span>
@@ -135,7 +138,7 @@
       <div class="year-display">2026</div>
       <div class="lunar-date">(TỨC NGÀY 04 THÁNG 11 NĂM BÍNH NGỌ)</div>
 
-      <!-- Countdown Component -->
+      <!-- Countdown -->
       <div class="countdown-container" id="countdownTimer">
         <div class="countdown-card">
           <div class="countdown-number" id="cdDays">00</div>
@@ -158,11 +161,11 @@
       <div class="timeline-schedule-box">
         <div class="timeline-item-col">
           <small>ĐÓN KHÁCH</small>
-          <span>11:00</span>
+          <span>11:30</span>
         </div>
         <div class="timeline-item-col">
           <small>KHAI TIỆC</small>
-          <span>11:30</span>
+          <span>12:00</span>
         </div>
       </div>
 
@@ -179,7 +182,6 @@
               <tr>
                 <td>7</td><td>8</td><td>9</td><td>10</td><td>11</td>
                 <td>
-                  <!-- NGÀY 12 HÌNH TRÁI TIM ĐỎ NỔI BẬT -->
                   <div class="calendar-heart-highlight">
                     <svg class="heart-svg-bg" viewBox="0 0 32 29.6">
                       <path d="M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.4,16,21.2,16,21.2s16-11.8,16-21.2C32,3.8,28.2,0,23.6,0z"/>
@@ -205,8 +207,8 @@
       </div>
     </div>
 
-    <!-- 4. ĐỊA ĐIỂM HÔN LỄ & LỜI CHÚC (GIỮ NGUYÊN CODE, THAY NỀN SECTION 3) -->
-    <div class="extra-section">
+    <!-- NỀN 3: ĐỊA ĐIỂM HÔN LỄ & FORM RSVP (DÙNG section 2.jpg) -->
+    <div class="location-rsvp-section">
       <div class="extra-section-title">ĐỊA ĐIỂM HÔN LỄ</div>
 
       <div class="event-box">
@@ -271,8 +273,11 @@
           </button>
         </form>
       </div>
+    </div>
 
-      <!-- DANH SÁCH LỜI CHÚC CUỘN VÔ HẠN -->
+    <!-- NỀN 4: LỜI CHÚC PHÚC ĐÃ NHẬN & QUÀ MỪNG & FOOTER (DÙNG section 3.jpg) -->
+    <div class="wishes-gift-section">
+      <!-- DANH SÁCH LỜI CHÚC TRÔI VÔ HẠN -->
       <div class="wishes-section-wrapper">
         <div class="wishes-header-group">
           <span class="wishes-icon">💌</span>
@@ -290,18 +295,20 @@
             <img src="https://lh3.googleusercontent.com/d/1d_IVnCnlq5Kg1fUIGrdKSywDD524vEcb=w1000" alt="Bao Lì Xì Cưới" class="floating-envelope-img" />
           </div>
 
-          <!-- Bóng đổ sàn co giãn theo độ cao bay -->
           <div class="envelope-floor-shadow"></div>
         </div>
 
         <p class="envelope-click-hint"><span>✨</span> Chạm vào phong bì để gửi quà mừng <span>✨</span></p>
       </div>
-	   <footer style="padding: 35px; text-align: center; font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">
-			NGUYỄN TUỆ & DIỄM TRANG • 2026
-		</footer>
+
+      <!-- CHÂN TRANG ĐỒNG BỘ TRÊN NỀN HOA CUỐI CÙNG -->
+      <footer class="wedding-footer">
+        NGUYỄN TUỆ & DIỄM TRANG • 2026
+      </footer>
     </div>
 
-  </div>
+  </div> <!-- Đóng wrapper -->
+  
   <!-- LIGHTBOX MODAL (ĐẶT Ở CUỐI TRANG TRƯỚC </body>) -->
   <div class="lightbox-modal" id="lightboxModal">
     <button class="lightbox-close-btn" id="lightboxClose">&times;</button>
