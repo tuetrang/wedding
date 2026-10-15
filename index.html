@@ -8,6 +8,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Montserrat:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet" />
   <!-- Nhúng bộ font đám cưới sang trọng: Playfair Display + Montserrat -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600;1,700&display=swap" rel="stylesheet" />
 
@@ -74,57 +75,19 @@
   </div>
 
   <!-- GIAO DIỆN CHÍNH -->
+ <!-- GIAO DIỆN CHÍNH -->
   <div class="wrapper">
-    
-    <!-- 1. THÔNG TIN LỄ CƯỚI -->
-    <div class="invitation-section">
-      <div class="section-title-top">THÔNG TIN LỄ CƯỚI</div>
+    <!-- 0. SAVE THE DATE (THAY BẰNG ẢNH MAIN 1) -->
+    <section class="poster-section save-the-date-poster">
+      <img src="./image/Main 1.png" alt="Save The Date - Nguyễn Tuệ & Diễm Trang" class="full-poster-img" />
+    </section>
 
-      <div class="parents-grid">
-        <div class="parent-column">
-          <div class="role-title">Ông Bà</div>
-          <div class="parent-names">Nguyễn Hải Châu<br />Võ Thị Quỳnh Giao</div>
-          <div class="parent-location">Thành phố Hồ Chí Minh</div>
-        </div>
-        <div class="parents-divider"></div>
-        <div class="parent-column">
-          <div class="role-title">Ông Bà</div>
-          <div class="parent-names">Phạm Minh Phương<br />Võ Thị Thu Cúc</div>
-          <div class="parent-location">Tỉnh Đồng Tháp</div>
-        </div>
-      </div>
+    <!-- 1. THÔNG TIN LỄ CƯỚI (THAY BẰNG ẢNH MAIN 2) -->
+    <section class="poster-section invitation-poster">
+      <img src="./image/Main 2.png" alt="Thông Tin Lễ Cưới - Nguyễn Tuệ & Diễm Trang" class="full-poster-img" />
+    </section>
 
-      <div class="announce-text">TRÂN TRỌNG BÁO TIN<br />LỄ THÀNH HÔN CỦA CON CHÚNG TÔI</div>
-
-      <div class="couple-main-name">Nguyễn Tuệ</div>
-      <div class="couple-role-sub">Trưởng Nam</div>
-
-      <div class="couple-ampersand">&</div>
-
-      <div class="couple-main-name">Diễm Trang</div>
-      <div class="couple-role-sub">Út Nữ</div>
-
-      <div class="event-info-block">
-        LỄ THÀNH HÔN ĐƯỢC CỬ HÀNH TẠI<br />
-        <strong>TƯ GIA</strong><br />
-        VÀO LÚC
-      </div>
-
-      <div style="font-family: var(--font-serif); font-size: 2.5rem; color: var(--text-brown); margin: 14px 0; font-weight: 700;">
-        09:00
-      </div>
-
-      <div class="date-display-box">
-        <span class="day-text">Thứ Bảy</span>
-        <span class="day-number">12</span>
-        <span class="month-text">Tháng 12</span>
-      </div>
-
-      <div class="year-display">2026</div>
-      <div class="lunar-date">(TỨC NGÀY 04 THÁNG 11 NĂM BÍNH NGỌ)</div>
-    </div>
-
-    <!-- 2. ALBUM ẢNH 3D COVERFLOW CHUẨN MẪU -->
+    <!-- 2. ALBUM ẢNH 3D COVERFLOW (GIỮ NGUYÊN CODE, THAY NỀN SECTION 1) -->
     <div class="album-section">
       <div class="album-container">
         <h2 class="album-heading">ALBUM ẢNH</h2>
@@ -156,7 +119,7 @@
       </div>
     </div>
 
-    <!-- 3. THÔNG TIN TIỆC CƯỚI & COUNTDOWN -->
+    <!-- 3. THÔNG TIN TIỆC CƯỚI & COUNTDOWN (GIỮ NGUYÊN CODE, THAY NỀN SECTION 2) -->
     <div class="reception-details-section">
       <div class="reception-header-title">THÔNG TIN TIỆC CƯỚI</div>
       <div class="reception-header-sub">TIỆC CƯỚI SẼ DIỄN RA VÀO LÚC:</div>
@@ -242,7 +205,7 @@
       </div>
     </div>
 
-    <!-- 4. ĐỊA ĐIỂM HÔN LỄ & LỜI CHÚC -->
+    <!-- 4. ĐỊA ĐIỂM HÔN LỄ & LỜI CHÚC (GIỮ NGUYÊN CODE, THAY NỀN SECTION 3) -->
     <div class="extra-section">
       <div class="extra-section-title">ĐỊA ĐIỂM HÔN LỄ</div>
 
@@ -325,8 +288,6 @@
         <div class="floating-envelope-stage">
           <div class="envelope-floating-item">
             <img src="https://lh3.googleusercontent.com/d/1d_IVnCnlq5Kg1fUIGrdKSywDD524vEcb=w1000" alt="Bao Lì Xì Cưới" class="floating-envelope-img" />
-            
-           
           </div>
 
           <!-- Bóng đổ sàn co giãn theo độ cao bay -->
@@ -335,13 +296,12 @@
 
         <p class="envelope-click-hint"><span>✨</span> Chạm vào phong bì để gửi quà mừng <span>✨</span></p>
       </div>
+	   <footer style="padding: 35px; text-align: center; font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">
+			NGUYỄN TUỆ & DIỄM TRANG • 2026
+		</footer>
     </div>
 
-    <footer style="padding: 35px; text-align: center; font-size: 0.85rem; color: var(--text-muted); background: rgba(228, 236, 224, 0.92) !important; font-weight: 600;">
-      NGUYỄN TUỆ & DIỄM TRANG • 2026
-    </footer>
   </div>
-
   <!-- LIGHTBOX MODAL (ĐẶT Ở CUỐI TRANG TRƯỚC </body>) -->
   <div class="lightbox-modal" id="lightboxModal">
     <button class="lightbox-close-btn" id="lightboxClose">&times;</button>
