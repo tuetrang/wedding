@@ -90,8 +90,8 @@ body {
   bottom: 24px;
   left: 20px;
   z-index: 900;
-  max-width: 290px;             /* Cố định không tràn sang phải đè nút nhạc */
-  width: calc(100% - 95px);    /* Chừa chỗ an toàn cho nút tròn góc phải */
+  max-width: 320px;
+  width: calc(100% - 90px);
   background: rgba(38, 59, 43, 0.95);
   backdrop-filter: blur(10px); 
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -288,34 +288,34 @@ body {
 .poster-section {
   width: 100%;
   display: block;
-  line-height: 0;
   margin: 0;
   padding: 0;
-  background: #FFF;
+  background: transparent;
   border: none !important;
-  outline: none !important;
+  position: relative;
+  z-index: 1;
 }
 
 .full-poster-img {
   width: 100%;
   height: auto;
   display: block;
-  object-fit: cover;
+  object-fit: contain;
   border: none !important;
 }
 
 /* =========================================================
-   4 SECTION TRẢI ĐỀU 4 ẢNH NỀN LIÊN TỤC (XÓA TRIỆT ĐỂ VẠCH KẺ)
+   4 SECTION NỀN: TÁCH BIỆT RÕ RÀNG, KHÔNG DÙNG MARGIN ÂM
    ========================================================= */
 
-/* 1. ALBUM SECTION  */
+/* 1. ALBUM SECTION (ĐẢM BẢO KHÔNG BỊ TRÔI LÊN ĐÈ VÀO MAIN 2) */
 .album-section {
   width: 100%;
   max-width: 680px;
   margin: 0 auto;
-  padding: 65px 20px 60px 20px;
-  background-image: url('../image/album.png') !important;
-  background-size: 100% 100% !important; /* Phủ kín không chừa mép */
+  padding: 70px 20px 60px 20px;
+  background-image: url('../image/album.png'), url('../image/Album.jpg') !important;
+  background-size: 100% 100% !important;
   background-position: center top !important;
   background-repeat: no-repeat !important;
   display: flex;
@@ -323,10 +323,8 @@ body {
   justify-content: center;
   align-items: center;
   position: relative;
-  overflow: hidden;
-  border: none !important;
-  outline: none !important;
-  margin-top: -1px; /* Khử triệt để đường line trắng giữa 2 section */
+  z-index: 2;
+  clear: both;
 }
 
 /* 2. SECTION TIỆC CƯỚI & COUNTDOWN */
@@ -336,29 +334,29 @@ body {
   margin: 0 auto;
   padding: 60px 20px 50px 20px;
   text-align: center;
-  background-image: url('../image/section 1.png') !important;
+  background-image: url('../image/section 1.png'), url('../image/section%201.png'), url('../image/section 1.jpg') !important;
   background-size: 100% 100% !important;
   background-position: center top !important;
   background-repeat: no-repeat !important;
-  border: none !important;
-  outline: none !important;
-  margin-top: -1px; /* Khử vạch kẻ nối */
+  position: relative;
+  z-index: 2;
+  clear: both;
 }
 
-/* 3. SECTION ĐỊA ĐIỂM & RSVP FORM  */
+/* 3. SECTION ĐỊA ĐIỂM & RSVP FORM */
 .location-rsvp-section {
   width: 100%;
   max-width: 680px;
   margin: 0 auto;
   padding: 55px 20px 45px 20px; 
-  background-image: url('../image/section 2.png') !important;
+  background-image: url('../image/section 2.png'), url('../image/section%202.png'), url('../image/section 2.jpg') !important;
   background-size: 100% 100% !important;
   background-position: center top !important;
   background-repeat: no-repeat !important;
   text-align: center;
-  border: none !important;
-  outline: none !important;
-  margin-top: -1px; /* Khử vạch kẻ trắng giữa section 1 và 2 */
+  position: relative;
+  z-index: 2;
+  clear: both;
 }
 
 /* 4. SECTION LỜI CHÚC & QUÀ MỪNG & FOOTER */
@@ -367,14 +365,14 @@ body {
   max-width: 680px;
   margin: 0 auto;
   padding: 50px 20px 30px 20px; 
-  background-image: url('../image/section 3.png') !important;
+  background-image: url('../image/section 3.png'), url('../image/section%203.png'), url('../image/section 3.jpg') !important;
   background-size: 100% 100% !important;
   background-position: center top !important;
   background-repeat: no-repeat !important;
   text-align: center;
-  border: none !important;
-  outline: none !important;
-  margin-top: -1px; /* Khử vạch kẻ nối */
+  position: relative;
+  z-index: 2;
+  clear: both;
 }
 
 /* TYPOGRAPHY CHO ALBUM ẢNH */
@@ -823,7 +821,7 @@ body {
   width: 100%;
   border-collapse: collapse;
   font-family: var(--font-lora);
-  font-size: 1.92rem;
+  font-size: 0.92rem;
   color: #3f5945;
 }
 .calendar-table th {
@@ -1358,32 +1356,56 @@ body {
 }
 
 /* =========================================================
-   RESPONSIVE HOÀN THIỆN CHO MÀN HÌNH ĐIỆN THOẠI (< 480PX)
+   RESPONSIVE TOÀN DIỆN CHO MOBILE & TABLET (ĐÃ FIX ĐÈ VÀ CẮT ẢNH)
    ========================================================= */
-@media (max-width: 480px) {
-  /* Khung và lề section */
-  .wrapper { width: 100% !important; max-width: 100% !important; }
-  .album-section { padding: 45px 12px 35px 12px !important; margin-top: -1px !important; }
-  .reception-details-section { padding: 45px 12px 40px 12px !important; margin-top: -1px !important; }
-  .location-rsvp-section { padding: 45px 12px 35px 12px !important; margin-top: -1px !important; }
-  .wishes-gift-section { padding: 40px 12px 25px 12px !important; margin-top: -1px !important; }
+@media (max-width: 768px) {
+  .album-section,
+  .reception-details-section,
+  .location-rsvp-section,
+  .wishes-gift-section {
+    background-size: 100% 100% !important;
+    background-position: center top !important;
+  }
+}
 
-  /* Tiêu đề chính các section */
-  .album-heading { font-size: 1.6rem !important; letter-spacing: 0.2em !important; margin-bottom: 18px !important; }
-  .extra-section-title { font-size: 1.6rem !important; letter-spacing: 0.15em !important; margin-bottom: 20px !important; }
-  .gift-box-title { font-size: 1.6rem !important; letter-spacing: 0.15em !important; margin-bottom: 18px !important; }
+@media (max-width: 480px) {
+  .wrapper { width: 100% !important; max-width: 100% !important; }
+
+  /* Tách riêng biệt, padding trên vừa đủ để Album không chồm lên đuôi Main 2 */
+  .album-section {
+    padding: 60px 15px 40px 15px !important;
+    margin-top: 0 !important;
+    position: relative !important;
+    z-index: 2 !important;
+  }
+  
+  .reception-details-section {
+    padding: 50px 12px 40px 12px !important;
+    margin-top: 0 !important;
+  }
+  
+  .location-rsvp-section {
+    padding: 45px 12px 35px 12px !important;
+    margin-top: 0 !important;
+  }
+  
+  .wishes-gift-section {
+    padding: 40px 12px 25px 12px !important;
+    margin-top: 0 !important;
+  }
 
   /* Album Coverflow Mobile */
-  .coverflow-wrapper { height: 310px !important; perspective: 700px !important; }
-  .coverflow-card { width: 175px !important; height: 260px !important; border-radius: 12px !important; }
-  .coverflow-card.prev-1 { transform: translateX(-80px) scale(0.85) rotateY(35deg) !important; }
-  .coverflow-card.next-1 { transform: translateX(80px) scale(0.85) rotateY(-35deg) !important; }
-  .coverflow-card.prev-2 { transform: translateX(-140px) scale(0.7) rotateY(45deg) !important; }
-  .coverflow-card.next-2 { transform: translateX(140px) scale(0.7) rotateY(-45deg) !important; }
-  .btn-prev { left: 8px !important; }
-  .btn-next { right: 8px !important; }
+  .album-heading { font-size: 1.6rem !important; letter-spacing: 0.2em !important; margin-bottom: 15px !important; }
+  .coverflow-wrapper { height: 300px !important; perspective: 650px !important; }
+  .coverflow-card { width: 170px !important; height: 255px !important; border-radius: 12px !important; }
+  .coverflow-card.prev-1 { transform: translateX(-75px) scale(0.85) rotateY(32deg) !important; }
+  .coverflow-card.next-1 { transform: translateX(75px) scale(0.85) rotateY(-32deg) !important; }
+  .coverflow-card.prev-2 { transform: translateX(-135px) scale(0.68) rotateY(42deg) !important; }
+  .coverflow-card.next-2 { transform: translateX(135px) scale(0.68) rotateY(-42deg) !important; }
+  .btn-prev { left: 6px !important; }
+  .btn-next { right: 6px !important; }
 
-  /* Section Tiệc Cưới: Tinh chỉnh font size mobile vừa vặn */
+  /* Cỡ chữ Tiệc Cưới Mobile */
   .reception-header-title { font-size: 1.45rem !important; letter-spacing: 0.15em !important; margin-bottom: 6px !important; }
   .reception-header-sub { font-size: 1.05rem !important; letter-spacing: 0.1em !important; margin-bottom: 10px !important; }
   .reception-main-time { font-size: 2.3rem !important; margin-bottom: 8px !important; }
@@ -1393,55 +1415,43 @@ body {
   .date-display-box .month-text { font-size: 1.1rem !important; }
   .date-display-box .day-number { font-size: 2.2rem !important; padding: 0 10px !important; }
   .year-display { font-size: 1.9rem !important; margin: 4px 0 !important; }
-  .lunar-date { font-size: 1.05rem !important; margin-bottom: 18px !important; }
+  .lunar-date { font-size: 0.95rem !important; margin-bottom: 18px !important; }
 
-  /* Timeline đón khách & khai tiệc */
+  /* Timeline & Countdown */
   .timeline-schedule-box { gap: 25px !important; margin: 18px 0 16px !important; }
   .timeline-item-col small { font-size: 1.05rem !important; margin-bottom: 3px !important; }
   .timeline-item-col span { font-size: 1.25rem !important; }
 
-  /* Countdown timer */
   .countdown-container { gap: 8px !important; padding: 0 4px !important; margin: 18px auto !important; }
   .countdown-card { padding: 10px 4px !important; border-radius: 10px !important; }
   .countdown-number { font-size: 1.35rem !important; }
   .countdown-label { font-size: 0.75rem !important; }
 
-  /* Khung Lịch Tháng 12 */
-  .calendar-box-container { max-width: 100% !important; margin: 22px auto 15px !important; }
-  .calendar-inner-frame { padding: 18px 12px 16px !important; }
-  .calendar-title-month { font-size: 1.25rem !important; margin-bottom: 14px !important; }
-  .calendar-table th { font-size: 1.05rem !important; padding: 8px 0 !important; }
-  .calendar-table td { font-size: 0.95rem !important; padding: 9px 0 !important; }
+  /* Khung Lịch */
+  .calendar-box-container { max-width: 95% !important; margin: 20px auto 15px !important; }
+  .calendar-inner-frame { padding: 18px 8px 16px !important; }
+  .calendar-title-month { font-size: 1.25rem !important; margin-bottom: 12px !important; }
+  .calendar-table th { font-size: 1.05rem !important; padding: 6px 0 !important; }
+  .calendar-table td { font-size: 0.95rem !important; padding: 8px 0 !important; }
 
-  /* Nút thêm lịch & RSVP */
+  /* Nút bấm & Form */
   .btn-add-calendar-link { font-size: 0.88rem !important; padding: 8px 20px !important; }
   .btn-rsvp-pill { font-size: 0.95rem !important; padding: 12px 35px !important; }
-
-  /* Form & Bản đồ */
   .rsvp-form-card { padding: 25px 16px !important; margin: 18px 0 10px 0 !important; }
   .rsvp-form-title { font-size: 1.55rem !important; }
   .form-row-dual { grid-template-columns: 1fr !important; gap: 12px !important; }
   .map-frame-container { height: 190px !important; }
 
-  /* Modal QR 2 người */
-  .qr-modal-body { grid-template-columns: 1fr !important; gap: 22px !important; padding: 18px 15px 22px !important; }
-  .qr-image-frame { max-width: 180px !important; }
-
-  /* FIX LỖI ĐÈ NHAU: Thu gọn widget Lời Chúc và tách riêng nút Nhạc */
+  /* Widget & QR Modal */
   .floating-ticker-widget {
     bottom: 16px !important;
     left: 12px !important;
     max-width: 260px !important;
-    width: calc(100vw - 85px) !important; /* Dừng cách lề phải 85px để nút nhạc có chỗ đứng riêng */
+    width: calc(100vw - 85px) !important;
     padding: 10px 12px !important;
   }
-  .ticker-slide-item {
-    font-size: 0.8rem !important;
-  }
-  .widget-fab-icon {
-    bottom: 16px !important;
-    left: 12px !important;
-  }
+  .ticker-slide-item { font-size: 0.8rem !important; }
+  .widget-fab-icon { bottom: 16px !important; left: 12px !important; }
   .music-btn {
     bottom: 16px !important;
     right: 12px !important;
@@ -1449,20 +1459,6 @@ body {
     height: 44px !important;
     font-size: 1.1rem !important;
   }
-  /* Thu gọn dòng âm lịch vừa vặn, không bị bè ngang */
-  .lunar-date {
-    font-size: 0.88rem !important;
-    font-weight: 600 !important;
-    letter-spacing: 0.03em !important;
-    margin-bottom: 20px !important;
-    padding: 0 10px !important;
-  }
-
-  /* Nút thêm vào lịch nét và dễ bấm hơn */
-  .btn-add-calendar-link {
-    font-size: 0.85rem !important;
-    font-weight: 700 !important;
-    border: 1.5px solid #263b2b !important;
-    padding: 8px 22px !important;
-  }
+  .qr-modal-body { grid-template-columns: 1fr !important; gap: 22px !important; padding: 18px 15px 22px !important; }
+  .qr-image-frame { max-width: 180px !important; }
 }
