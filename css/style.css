@@ -1,7 +1,7 @@
 :root {
   --bg-cream: #EBF1E8;
   --card-cream: #F3F7F0;
-  --text-brown: #263b2b;       /* Màu xanh rêu đậm chuẩn từ Main 2 */
+  --text-brown: #263b2b;
   --text-main: #263b2b;
   --text-muted: #3f5945;
   --btn-brown: #263b2b;
@@ -292,28 +292,27 @@ body {
   padding: 0;
   background: transparent;
   border: none !important;
-  position: relative;
-  z-index: 1;
+  line-height: 0;
 }
 
 .full-poster-img {
   width: 100%;
   height: auto;
   display: block;
-  object-fit: contain;
+  object-fit: cover;
   border: none !important;
 }
 
 /* =========================================================
-   4 SECTION NỀN: TÁCH BIỆT RÕ RÀNG, KHÔNG DÙNG MARGIN ÂM
+   4 SECTION NỀN: ÉP 100% 100% HIỆN TRỌN BÔNG HOA 2 MÉP
    ========================================================= */
 
-/* 1. ALBUM SECTION (ĐẢM BẢO KHÔNG BỊ TRÔI LÊN ĐÈ VÀO MAIN 2) */
+/* 1. ALBUM SECTION */
 .album-section {
   width: 100%;
   max-width: 680px;
   margin: 0 auto;
-  padding: 70px 20px 60px 20px;
+  padding: 55px 20px 45px 20px;
   background-image: url('../image/album.png'), url('../image/Album.jpg') !important;
   background-size: 100% 100% !important;
   background-position: center top !important;
@@ -323,7 +322,6 @@ body {
   justify-content: center;
   align-items: center;
   position: relative;
-  z-index: 2;
   clear: both;
 }
 
@@ -339,7 +337,6 @@ body {
   background-position: center top !important;
   background-repeat: no-repeat !important;
   position: relative;
-  z-index: 2;
   clear: both;
 }
 
@@ -355,7 +352,6 @@ body {
   background-repeat: no-repeat !important;
   text-align: center;
   position: relative;
-  z-index: 2;
   clear: both;
 }
 
@@ -371,11 +367,12 @@ body {
   background-repeat: no-repeat !important;
   text-align: center;
   position: relative;
-  z-index: 2;
   clear: both;
 }
 
-/* TYPOGRAPHY CHO ALBUM ẢNH */
+/* =========================================================
+   COVERFLOW 3D ĐẲNG CẤP (HỖ TRỢ FULL WEBKIT CHO MOBILE)
+   ========================================================= */
 .album-container {
   width: 100%;
   max-width: 580px;
@@ -402,7 +399,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  perspective: 900px;
+  -webkit-perspective: 1000px;
+  perspective: 1000px;
   user-select: none;
 }
 
@@ -413,6 +411,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  -webkit-transform-style: preserve-3d;
   transform-style: preserve-3d;
 }
 
@@ -423,9 +422,11 @@ body {
   border-radius: 16px;
   overflow: hidden;
   background: #FFF;
-  box-shadow: 0 15px 32px rgba(0, 0, 0, 0.16);
+  box-shadow: 0 15px 32px rgba(0, 0, 0, 0.2);
   cursor: pointer;
-  transition: transform 0.65s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.65s ease, filter 0.65s ease, box-shadow 0.65s ease;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transition: transform 0.65s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.65s ease, filter 0.65s ease;
   will-change: transform, opacity;
 }
 
@@ -438,21 +439,25 @@ body {
   cursor: pointer;
 }
 
+/* HIỆU ỨNG 3D CHUẨN CẢ TRÊN PC LẪN MOBILE */
 .coverflow-card.active {
+  -webkit-transform: translateX(0) scale(1) translateZ(0);
   transform: translateX(0) scale(1) translateZ(0);
   z-index: 10;
   opacity: 1;
   filter: brightness(1);
-  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.25);
 }
 
 .coverflow-card.prev-1 {
+  -webkit-transform: translateX(-130px) scale(0.86) rotateY(40deg);
   transform: translateX(-130px) scale(0.86) rotateY(40deg);
   z-index: 6;
   opacity: 0.88;
   filter: brightness(0.96);
 }
 .coverflow-card.next-1 {
+  -webkit-transform: translateX(130px) scale(0.86) rotateY(-40deg);
   transform: translateX(130px) scale(0.86) rotateY(-40deg);
   z-index: 6;
   opacity: 0.88;
@@ -460,12 +465,14 @@ body {
 }
 
 .coverflow-card.prev-2 {
+  -webkit-transform: translateX(-215px) scale(0.72) rotateY(52deg);
   transform: translateX(-215px) scale(0.72) rotateY(52deg);
   z-index: 2;
   opacity: 0.65;
   filter: brightness(0.9);
 }
 .coverflow-card.next-2 {
+  -webkit-transform: translateX(215px) scale(0.72) rotateY(-52deg);
   transform: translateX(215px) scale(0.72) rotateY(-52deg);
   z-index: 2;
   opacity: 0.65;
@@ -473,6 +480,7 @@ body {
 }
 
 .coverflow-card.hidden-card {
+  -webkit-transform: translateX(0) scale(0.4);
   transform: translateX(0) scale(0.4);
   z-index: 0;
   opacity: 0;
@@ -1356,7 +1364,7 @@ body {
 }
 
 /* =========================================================
-   RESPONSIVE TOÀN DIỆN CHO MOBILE & TABLET (ĐÃ FIX ĐÈ VÀ CẮT ẢNH)
+   RESPONSIVE CHO MOBILE (FIX TRIỆT ĐỂ BẸP 2D COVERFLOW)
    ========================================================= */
 @media (max-width: 768px) {
   .album-section,
@@ -1371,45 +1379,74 @@ body {
 @media (max-width: 480px) {
   .wrapper { width: 100% !important; max-width: 100% !important; }
 
-  /* Tách riêng biệt, padding trên vừa đủ để Album không chồm lên đuôi Main 2 */
+  /* Section Album */
   .album-section {
-    padding: 60px 15px 40px 15px !important;
-    margin-top: 0 !important;
-    position: relative !important;
+    padding: 50px 10px 40px 10px !important;
+  }
+  .album-heading {
+    font-size: 1.55rem !important;
+    letter-spacing: 0.22em !important;
+    margin-bottom: 20px !important;
+  }
+
+  /* KHUNG 3D CHO MOBILE: ÉP WEBKIT GIỮ GÓC XOAY NGHIÊNG */
+  .coverflow-wrapper {
+    height: 310px !important;
+    -webkit-perspective: 800px !important;
+    perspective: 800px !important;
+  }
+  .coverflow-track {
+    -webkit-transform-style: preserve-3d !important;
+    transform-style: preserve-3d !important;
+  }
+  .coverflow-card {
+    width: 165px !important;
+    height: 255px !important;
+    border-radius: 14px !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.22) !important;
+  }
+
+  /* TỈ LỆ CO GIÃN VÀ XOAY NGHIÊNG 3D MOBILE CHUẨN XÁC */
+  .coverflow-card.active {
+    -webkit-transform: translateX(0) scale(1) translateZ(0) !important;
+    transform: translateX(0) scale(1) translateZ(0) !important;
+    z-index: 10 !important;
+    opacity: 1 !important;
+  }
+  .coverflow-card.prev-1 {
+    -webkit-transform: translateX(-88px) scale(0.84) rotateY(38deg) !important;
+    transform: translateX(-88px) scale(0.84) rotateY(38deg) !important;
+    z-index: 6 !important;
+    opacity: 0.88 !important;
+  }
+  .coverflow-card.next-1 {
+    -webkit-transform: translateX(88px) scale(0.84) rotateY(-38deg) !important;
+    transform: translateX(88px) scale(0.84) rotateY(-38deg) !important;
+    z-index: 6 !important;
+    opacity: 0.88 !important;
+  }
+  .coverflow-card.prev-2 {
+    -webkit-transform: translateX(-145px) scale(0.7) rotateY(48deg) !important;
+    transform: translateX(-145px) scale(0.7) rotateY(48deg) !important;
     z-index: 2 !important;
+    opacity: 0.6 !important;
   }
-  
-  .reception-details-section {
-    padding: 50px 12px 40px 12px !important;
-    margin-top: 0 !important;
-  }
-  
-  .location-rsvp-section {
-    padding: 45px 12px 35px 12px !important;
-    margin-top: 0 !important;
-  }
-  
-  .wishes-gift-section {
-    padding: 40px 12px 25px 12px !important;
-    margin-top: 0 !important;
+  .coverflow-card.next-2 {
+    -webkit-transform: translateX(145px) scale(0.7) rotateY(-48deg) !important;
+    transform: translateX(145px) scale(0.7) rotateY(-48deg) !important;
+    z-index: 2 !important;
+    opacity: 0.6 !important;
   }
 
-  /* Album Coverflow Mobile */
-  .album-heading { font-size: 1.6rem !important; letter-spacing: 0.2em !important; margin-bottom: 15px !important; }
-  .coverflow-wrapper { height: 300px !important; perspective: 650px !important; }
-  .coverflow-card { width: 170px !important; height: 255px !important; border-radius: 12px !important; }
-  .coverflow-card.prev-1 { transform: translateX(-75px) scale(0.85) rotateY(32deg) !important; }
-  .coverflow-card.next-1 { transform: translateX(75px) scale(0.85) rotateY(-32deg) !important; }
-  .coverflow-card.prev-2 { transform: translateX(-135px) scale(0.68) rotateY(42deg) !important; }
-  .coverflow-card.next-2 { transform: translateX(135px) scale(0.68) rotateY(-42deg) !important; }
-  .btn-prev { left: 6px !important; }
-  .btn-next { right: 6px !important; }
+  .btn-prev { left: 8px !important; width: 32px !important; height: 32px !important; }
+  .btn-next { right: 8px !important; width: 32px !important; height: 32px !important; }
 
-  /* Cỡ chữ Tiệc Cưới Mobile */
+  /* SECTION TIỆC CƯỚI */
+  .reception-details-section { padding: 45px 15px 40px 15px !important; }
   .reception-header-title { font-size: 1.45rem !important; letter-spacing: 0.15em !important; margin-bottom: 6px !important; }
   .reception-header-sub { font-size: 1.05rem !important; letter-spacing: 0.1em !important; margin-bottom: 10px !important; }
   .reception-main-time { font-size: 2.3rem !important; margin-bottom: 8px !important; }
-  
+
   .date-display-box { gap: 10px !important; margin: 8px auto !important; }
   .date-display-box .day-text,
   .date-display-box .month-text { font-size: 1.1rem !important; }
@@ -1417,7 +1454,6 @@ body {
   .year-display { font-size: 1.9rem !important; margin: 4px 0 !important; }
   .lunar-date { font-size: 0.95rem !important; margin-bottom: 18px !important; }
 
-  /* Timeline & Countdown */
   .timeline-schedule-box { gap: 25px !important; margin: 18px 0 16px !important; }
   .timeline-item-col small { font-size: 1.05rem !important; margin-bottom: 3px !important; }
   .timeline-item-col span { font-size: 1.25rem !important; }
@@ -1427,22 +1463,28 @@ body {
   .countdown-number { font-size: 1.35rem !important; }
   .countdown-label { font-size: 0.75rem !important; }
 
-  /* Khung Lịch */
-  .calendar-box-container { max-width: 95% !important; margin: 20px auto 15px !important; }
+  .calendar-box-container { max-width: 95% !important; margin: 22px auto 15px !important; }
   .calendar-inner-frame { padding: 18px 8px 16px !important; }
-  .calendar-title-month { font-size: 1.25rem !important; margin-bottom: 12px !important; }
-  .calendar-table th { font-size: 1.05rem !important; padding: 6px 0 !important; }
-  .calendar-table td { font-size: 0.95rem !important; padding: 8px 0 !important; }
+  .calendar-title-month { font-size: 1.25rem !important; margin-bottom: 14px !important; }
+  .calendar-table th { font-size: 1.05rem !important; padding: 8px 0 !important; }
+  .calendar-table td { font-size: 0.95rem !important; padding: 9px 0 !important; }
 
-  /* Nút bấm & Form */
   .btn-add-calendar-link { font-size: 0.88rem !important; padding: 8px 20px !important; }
   .btn-rsvp-pill { font-size: 0.95rem !important; padding: 12px 35px !important; }
-  .rsvp-form-card { padding: 25px 16px !important; margin: 18px 0 10px 0 !important; }
+
+  /* SECTION ĐỊA ĐIỂM & RSVP */
+  .location-rsvp-section { padding: 45px 15px 35px 15px !important; }
+  .extra-section-title { font-size: 1.55rem !important; margin-bottom: 20px !important; }
+  .rsvp-form-card { padding: 25px 16px !important; }
   .rsvp-form-title { font-size: 1.55rem !important; }
   .form-row-dual { grid-template-columns: 1fr !important; gap: 12px !important; }
   .map-frame-container { height: 190px !important; }
 
-  /* Widget & QR Modal */
+  /* SECTION LỜI CHÚC & QUÀ MỪNG */
+  .wishes-gift-section { padding: 40px 15px 25px 15px !important; }
+  .gift-box-title { font-size: 1.55rem !important; margin-bottom: 18px !important; }
+
+  /* FIXED WIDGET & NÚT NHẠC */
   .floating-ticker-widget {
     bottom: 16px !important;
     left: 12px !important;
