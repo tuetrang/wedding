@@ -371,7 +371,7 @@ body {
 }
 
 /* =========================================================
-   COVERFLOW 3D ĐỒNG BỘ: SỬ DỤNG PERSPECTIVE NỘI BỘ TRÁNH LỖI IOS
+   COVERFLOW 3D ĐỒNG BỘ: SỬ DỤNG PERSPECTIVE NỘI BỘ
    ========================================================= */
 .album-container {
   width: 100%;
@@ -441,7 +441,6 @@ body {
   cursor: pointer;
 }
 
-/* ĐẶT PERSPECTIVE() TRỰC TIẾP LÊN TỪNG CLASS ĐỂ ÉP SAFARI MOBILE PHẢI RENDER 3D */
 .coverflow-card.active {
   -webkit-transform: perspective(1000px) translateX(0) translateZ(0) rotateY(0deg) scale(1) !important;
   transform: perspective(1000px) translateX(0) translateZ(0) rotateY(0deg) scale(1) !important;
@@ -1366,7 +1365,7 @@ body {
 }
 
 /* =========================================================
-   RESPONSIVE CHO MOBILE (ÉP WEBKIT SAFARI HIỂN THỊ ĐÚNG GÓC 3D)
+   RESPONSIVE CHO MOBILE (TĂNG KÍCH THƯỚC CARD ẢNH CƯỚI TO RÕ)
    ========================================================= */
 @media (max-width: 768px) {
   .album-section,
@@ -1383,7 +1382,7 @@ body {
 
   /* Section Album */
   .album-section {
-    padding: 55px 10px 40px 10px !important;
+    padding: 55px 10px 45px 10px !important;
   }
   .album-heading {
     font-size: 1.55rem !important;
@@ -1391,60 +1390,60 @@ body {
     margin-bottom: 22px !important;
   }
 
-  /* KHUNG 3D CHO MOBILE: PERSPECTIVE 600px TẠO ĐỘ SÂU RẤT RÕ */
+  /* NÂNG CHIỀU CAO WRAPPER VÀ CARD ẢNH LÊN TO RÕ RÀNG */
   .coverflow-wrapper {
-    height: 310px !important;
-    -webkit-perspective: 600px !important;
-    perspective: 600px !important;
+    height: 350px !important;        /* Nâng từ 310px lên 350px */
+    -webkit-perspective: 700px !important;
+    perspective: 700px !important;
   }
   .coverflow-track {
     -webkit-transform-style: preserve-3d !important;
     transform-style: preserve-3d !important;
   }
   .coverflow-card {
-    width: 165px !important;
-    height: 255px !important;
-    border-radius: 14px !important;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.22) !important;
+    width: 195px !important;         /* Tăng từ 165px lên 195px */
+    height: 295px !important;        /* Tăng từ 255px lên 295px */
+    border-radius: 16px !important;
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.24) !important;
   }
 
-  /* ÉP GÓC NGHIÊNG 3D VỚI PERSPECTIVE NỘI BỘ VÀ ROTATEY MẠNH HƠN */
+  /* CÂN CHỈNH KHOẢNG CÁCH DỊCH CHUYỂN PHÙ HỢP CỠ CARD MỚI */
   .coverflow-card.active {
-    -webkit-transform: perspective(600px) translateX(0) translateZ(0) rotateY(0deg) scale(1) !important;
-    transform: perspective(600px) translateX(0) translateZ(0) rotateY(0deg) scale(1) !important;
+    -webkit-transform: perspective(700px) translateX(0) translateZ(0) rotateY(0deg) scale(1) !important;
+    transform: perspective(700px) translateX(0) translateZ(0) rotateY(0deg) scale(1) !important;
     z-index: 10 !important;
     opacity: 1 !important;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3) !important;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.32) !important;
   }
   .coverflow-card.prev-1 {
-    -webkit-transform: perspective(600px) translateX(-95px) translateZ(-50px) rotateY(45deg) scale(0.85) !important;
-    transform: perspective(600px) translateX(-95px) translateZ(-50px) rotateY(45deg) scale(0.85) !important;
+    -webkit-transform: perspective(700px) translateX(-110px) translateZ(-50px) rotateY(42deg) scale(0.85) !important;
+    transform: perspective(700px) translateX(-110px) translateZ(-50px) rotateY(42deg) scale(0.85) !important;
     z-index: 6 !important;
-    opacity: 0.85 !important;
+    opacity: 0.88 !important;
     filter: brightness(0.9) !important;
   }
   .coverflow-card.next-1 {
-    -webkit-transform: perspective(600px) translateX(95px) translateZ(-50px) rotateY(-45deg) scale(0.85) !important;
-    transform: perspective(600px) translateX(95px) translateZ(-50px) rotateY(-45deg) scale(0.85) !important;
+    -webkit-transform: perspective(700px) translateX(110px) translateZ(-50px) rotateY(-42deg) scale(0.85) !important;
+    transform: perspective(700px) translateX(110px) translateZ(-50px) rotateY(-42deg) scale(0.85) !important;
     z-index: 6 !important;
-    opacity: 0.85 !important;
+    opacity: 0.88 !important;
     filter: brightness(0.9) !important;
   }
   .coverflow-card.prev-2 {
-    -webkit-transform: perspective(600px) translateX(-155px) translateZ(-100px) rotateY(55deg) scale(0.7) !important;
-    transform: perspective(600px) translateX(-155px) translateZ(-100px) rotateY(55deg) scale(0.7) !important;
+    -webkit-transform: perspective(700px) translateX(-175px) translateZ(-100px) rotateY(52deg) scale(0.7) !important;
+    transform: perspective(700px) translateX(-175px) translateZ(-100px) rotateY(52deg) scale(0.7) !important;
     z-index: 2 !important;
     opacity: 0.55 !important;
   }
   .coverflow-card.next-2 {
-    -webkit-transform: perspective(600px) translateX(155px) translateZ(-100px) rotateY(-55deg) scale(0.7) !important;
-    transform: perspective(600px) translateX(155px) translateZ(-100px) rotateY(-55deg) scale(0.7) !important;
+    -webkit-transform: perspective(700px) translateX(175px) translateZ(-100px) rotateY(-52deg) scale(0.7) !important;
+    transform: perspective(700px) translateX(175px) translateZ(-100px) rotateY(-52deg) scale(0.7) !important;
     z-index: 2 !important;
     opacity: 0.55 !important;
   }
 
-  .btn-prev { left: 6px !important; width: 32px !important; height: 32px !important; }
-  .btn-next { right: 6px !important; width: 32px !important; height: 32px !important; }
+  .btn-prev { left: 4px !important; width: 34px !important; height: 34px !important; }
+  .btn-next { right: 4px !important; width: 34px !important; height: 34px !important; }
 
   /* SECTION TIỆC CƯỚI */
   .reception-details-section { padding: 45px 15px 40px 15px !important; }
