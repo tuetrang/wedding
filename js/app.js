@@ -47,15 +47,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnOpen.dataset.opened === '1') return;
     btnOpen.dataset.opened = '1';
 
-    // 1. TỰ ĐỘNG ĐƯA TOÀN BỘ TRANG VỀ TRÊN CÙNG HẾT
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
 
-    // 2. Mở màn hình bìa thiệp
     gateScreen?.classList.add('opened');
 
-    // 3. Tự phát nhạc
     if (audioPlayer) {
       audioPlayer.muted = false;
       audioPlayer.volume = 1.0;
@@ -100,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setInterval(updateCountdown, 1000);
   updateCountdown();
 
-  // --- XỬ LÝ CHỌN SỐ LƯỢNG KHÁCH (CÓ Ô SỐ KHÁC) ---
+  // --- XỬ LÝ CHỌN SỐ LƯỢNG KHÁCH ---
   const guestsSelect = document.getElementById('rsvpGuestsSelect');
   const guestsCustom = document.getElementById('rsvpGuestsCustom');
 
@@ -116,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // --- SUBMIT FORM VỚI CƠ CHẾ SONG SONG (FIREBASE + GOOGLE SHEET) ---
+  // --- SUBMIT FORM SONG SONG ---
   const rsvpForm = document.getElementById('rsvpForm');
   const loadingOverlay = document.getElementById('loadingOverlay');
 
@@ -219,18 +216,22 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ====================================================================
-  // --- ALBUM 3D COVERFLOW: BẤM NÚT + DOTS + VUỐT TAY TRÊN ĐIỆN THOẠI ---
+  // --- ALBUM 3D COVERFLOW & LIGHTBOX GALLERY NÂNG CAO ---
   // ====================================================================
   const cards = document.querySelectorAll('.coverflow-card');
   const dotsBox = document.getElementById('dotsBox');
   const btnNext = document.getElementById('btnNext');
   const btnPrev = document.getElementById('btnPrev');
   const wrapper = document.getElementById('coverflowWrapper');
-  const lightbox = document.getElementById('lightboxModal');
-  const zoomImg = document.getElementById('lightboxZoomImg');
 
   let currentCardIndex = 0;
   let autoPlayTimer = null;
+
+  // Danh sách hình ảnh album
+  const imageList = Array.from(cards).map(card => {
+    const img = card.querySelector('img');
+    return img ? img.src : '';
+  }).filter(src => src !== '');
 
   // 1. Tạo thanh chấm Dots điều hướng
   if (dotsBox && cards.length > 0) {
@@ -248,7 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const dots = document.querySelectorAll('.dot-item');
 
-  // 2. Tính toán phân tầng phối cảnh 3D
+  // 2. Cập nhật class Coverflow 3D
   function updateCoverflow(index) {
     const total = cards.length;
     if (total === 0) return;
@@ -300,27 +301,11 @@ document.addEventListener('DOMContentLoaded', () => {
     prevSlide();
   });
 
-  // 3. Click vào ảnh: Ở giữa mở Lightbox, ở 2 bên trượt về giữa
-  cards.forEach((card, idx) => {
-    card.addEventListener('click', (e) => {
-      e.stopPropagation();
-      if (idx === currentCardIndex) {
-        const clickedImg = card.querySelector('img');
-        if (clickedImg && zoomImg && lightbox) {
-          zoomImg.src = clickedImg.src;
-          lightbox.classList.add('active');
-        }
-      } else {
-        goToSlide(idx);
-      }
-    });
-  });
-
-  // 4. Tự động chuyển slide mượt mà
+  // Tự động trượt Coverflow
   function startAutoPlay() {
     if (cards.length > 0) {
       clearInterval(autoPlayTimer);
-      autoPlayTimer = setInterval(nextSlide, 3200);
+      autoPlayTimer = setInterval(nextSlide, 3500);
     }
   }
 
@@ -332,50 +317,154 @@ document.addEventListener('DOMContentLoaded', () => {
   wrapper?.addEventListener('mouseenter', () => clearInterval(autoPlayTimer));
   wrapper?.addEventListener('mouseleave', () => startAutoPlay());
 
-  // 5. CƠ CHẾ VUỐT CẢM ỨNG TRÊN MÀN HÌNH ĐIỆN THOẠI (TOUCH SWIPE)
-  let touchStartX = 0;
-  let touchStartY = 0;
-  let isSwiping = false;
+  // Vuốt chạm trên Coverflow
+  let cfTouchStartX = 0;
+  let cfTouchStartY = 0;
+  let cfIsSwiping = false;
 
   wrapper?.addEventListener('touchstart', (e) => {
-    touchStartX = e.changedTouches[0].screenX;
-    touchStartY = e.changedTouches[0].screenY;
-    isSwiping = true;
+    cfTouchStartX = e.changedTouches[0].screenX;
+    cfTouchStartY = e.changedTouches[0].screenY;
+    cfIsSwiping = true;
     clearInterval(autoPlayTimer);
   }, { passive: true });
 
   wrapper?.addEventListener('touchend', (e) => {
-    if (!isSwiping) return;
-    isSwiping = false;
+    if (!cfIsSwiping) return;
+    cfIsSwiping = false;
 
-    const touchEndX = e.changedTouches[0].screenX;
-    const touchEndY = e.changedTouches[0].screenY;
-
-    const diffX = touchStartX - touchEndX;
-    const diffY = touchStartY - touchEndY;
+    const diffX = cfTouchStartX - e.changedTouches[0].screenX;
+    const diffY = cfTouchStartY - e.changedTouches[0].screenY;
 
     if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 35) {
-      if (diffX > 0) {
-        nextSlide();
-      } else {
-        prevSlide();
-      }
+      if (diffX > 0) nextSlide();
+      else prevSlide();
     }
-
     startAutoPlay();
   }, { passive: true });
 
-  // 6. Đóng Lightbox
-  document.getElementById('lightboxClose')?.addEventListener('click', (e) => {
+  // ====================================================================
+  // --- LOGIC LIGHTBOX GALLERY (CHUYỂN ẢNH LIÊN TỤC + THUMBNAILS + SWIPE)
+  // ====================================================================
+  const lbModal = document.getElementById('lightboxModal');
+  const lbZoomImg = document.getElementById('lightboxZoomImg');
+  const lbCounter = document.getElementById('lbCounter');
+  const lbBtnClose = document.getElementById('lightboxClose');
+  const lbBtnPrev = document.getElementById('lbBtnPrev');
+  const lbBtnNext = document.getElementById('lbBtnNext');
+  const lbThumbStrip = document.getElementById('lbThumbStrip');
+  const lbMainStage = document.getElementById('lbMainStage');
+
+  let currentGalleryIndex = 0;
+
+  // Khởi tạo Dải Thumbnail
+  if (lbThumbStrip && imageList.length > 0) {
+    lbThumbStrip.innerHTML = '';
+    imageList.forEach((src, idx) => {
+      const thumb = document.createElement('div');
+      thumb.className = `lb-thumb-item ${idx === 0 ? 'active' : ''}`;
+      thumb.innerHTML = `<img src="${src}" alt="Thumb ${idx + 1}" />`;
+      thumb.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openGalleryAt(idx);
+      });
+      lbThumbStrip.appendChild(thumb);
+    });
+  }
+
+  // Hàm chuyển ảnh trong Lightbox
+  function openGalleryAt(index) {
+    if (index < 0) index = imageList.length - 1;
+    if (index >= imageList.length) index = 0;
+    currentGalleryIndex = index;
+
+    if (lbZoomImg) {
+      lbZoomImg.style.opacity = '0.25';
+      lbZoomImg.style.transform = 'scale(0.96)';
+
+      setTimeout(() => {
+        lbZoomImg.src = imageList[currentGalleryIndex];
+        lbZoomImg.style.opacity = '1';
+        lbZoomImg.style.transform = 'scale(1)';
+      }, 100);
+    }
+
+    if (lbCounter) {
+      lbCounter.textContent = `${currentGalleryIndex + 1} / ${imageList.length}`;
+    }
+
+    // Đánh dấu thumbnail active & cuộn thumbnail vào vùng nhìn
+    const thumbs = lbThumbStrip?.querySelectorAll('.lb-thumb-item');
+    thumbs?.forEach((t, i) => {
+      if (i === currentGalleryIndex) {
+        t.classList.add('active');
+        t.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      } else {
+        t.classList.remove('active');
+      }
+    });
+  }
+
+  // Click vào card Coverflow: Ở giữa mở Lightbox, ở 2 bên cuộn về giữa
+  cards.forEach((card, idx) => {
+    card.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (idx === currentCardIndex) {
+        openGalleryAt(idx);
+        lbModal?.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      } else {
+        goToSlide(idx);
+      }
+    });
+  });
+
+  // Điều hướng Lightbox
+  lbBtnPrev?.addEventListener('click', (e) => {
     e.stopPropagation();
-    lightbox?.classList.remove('active');
+    openGalleryAt(currentGalleryIndex - 1);
   });
 
-  lightbox?.addEventListener('click', (e) => {
-    if (e.target === lightbox) lightbox.classList.remove('active');
+  lbBtnNext?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openGalleryAt(currentGalleryIndex + 1);
   });
 
-  // --- URL PARAMS GUEST INJECTION (?invite=) ---
+  function closeLightbox() {
+    lbModal?.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  lbBtnClose?.addEventListener('click', closeLightbox);
+  lbModal?.addEventListener('click', (e) => {
+    if (e.target === lbModal || e.target === lbMainStage) {
+      closeLightbox();
+    }
+  });
+
+  // Phím điều hướng máy tính
+  document.addEventListener('keydown', (e) => {
+    if (!lbModal?.classList.contains('active')) return;
+    if (e.key === 'ArrowLeft') openGalleryAt(currentGalleryIndex - 1);
+    if (e.key === 'ArrowRight') openGalleryAt(currentGalleryIndex + 1);
+    if (e.key === 'Escape') closeLightbox();
+  });
+
+  // Vuốt chạm chuyển ảnh trên màn hình Lightbox di động
+  let lbTouchStartX = 0;
+  lbMainStage?.addEventListener('touchstart', (e) => {
+    lbTouchStartX = e.changedTouches[0].screenX;
+  }, { passive: true });
+
+  lbMainStage?.addEventListener('touchend', (e) => {
+    const diff = lbTouchStartX - e.changedTouches[0].screenX;
+    if (Math.abs(diff) > 40) {
+      if (diff > 0) openGalleryAt(currentGalleryIndex + 1);
+      else openGalleryAt(currentGalleryIndex - 1);
+    }
+  }, { passive: true });
+
+  // --- URL PARAMS GUEST INJECTION ---
   const params = new URLSearchParams(window.location.search);
   const rawGuest = params.get('invite') || '';
   if (rawGuest) {
@@ -394,7 +483,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.target === giftModal) giftModal.classList.remove('active');
   });
 
-  // Khởi chạy Coverflow
+  // Khởi chạy
   updateCoverflow(0);
   startAutoPlay();
 });

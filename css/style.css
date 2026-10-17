@@ -535,23 +535,28 @@ body {
   background: #263b2b !important;
 }
 
-/* KHUNG PHÓNG TO ẢNH (LIGHTBOX MODAL) */
+/* =========================================================
+   LIGHTBOX GALLERY NÂNG CAO (GIAO DIỆN XEM ẢNH FULL BỘ)
+   ========================================================= */
 .lightbox-modal {
   position: fixed !important;
   inset: 0 !important;
-  top: 0 !important;
-  left: 0 !important;
   width: 100vw !important;
   height: 100vh !important;
-  background: rgba(0, 0, 0, 0.92) !important;
-  z-index: 9999999 !important;
+  background: rgba(10, 15, 12, 0.96) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  z-index: 10000000 !important;
   display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
   align-items: center !important;
-  justify-content: center !important;
-  opacity: 0 !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
+  padding: 15px 0 20px 0 !important;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
   transition: opacity 0.3s ease, visibility 0.3s ease !important;
+  user-select: none;
 }
 
 .lightbox-modal.active {
@@ -560,26 +565,131 @@ body {
   pointer-events: auto !important;
 }
 
-.lightbox-modal img {
-  max-width: 90vw !important;
-  max-height: 85vh !important;
-  border-radius: 12px !important;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.6) !important;
-  object-fit: contain !important;
-  display: block !important;
+.lb-top-bar {
+  width: 100%;
+  max-width: 680px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 20px;
+  flex-shrink: 0;
+  z-index: 10;
 }
 
-.lightbox-close-btn {
-  position: absolute !important;
-  top: 20px !important;
-  right: 25px !important;
-  background: none !important;
-  border: none !important;
-  color: #FFF !important;
-  font-size: 2.5rem !important;
-  cursor: pointer !important;
-  line-height: 1 !important;
-  z-index: 10000000 !important;
+.lb-counter {
+  font-family: var(--font-lora);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+.lb-close-btn {
+  background: none;
+  border: none;
+  color: #FFF;
+  font-size: 2.2rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 4px 8px;
+  transition: transform 0.2s;
+}
+.lb-close-btn:active {
+  transform: scale(0.9);
+}
+
+.lb-main-stage {
+  position: relative;
+  width: 100%;
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  touch-action: pan-y;
+}
+
+.lb-image-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 5px 15px;
+}
+
+.lb-image-container img {
+  max-width: 92%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.lb-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #FFF;
+  font-size: 1.4rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 15;
+  transition: background 0.2s, transform 0.2s;
+}
+.lb-nav-btn:hover {
+  background: rgba(38, 59, 43, 0.85);
+}
+.lb-btn-prev { left: 14px; }
+.lb-btn-next { right: 14px; }
+
+.lb-thumbnails-strip {
+  width: 100%;
+  max-width: 620px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px 5px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  flex-shrink: 0;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.lb-thumbnails-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.lb-thumb-item {
+  width: 58px;
+  height: 72px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: all 0.25s ease;
+}
+.lb-thumb-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.lb-thumb-item.active {
+  opacity: 1;
+  border-color: #FFF;
+  transform: scale(1.06);
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.35);
 }
 
 /* =========================================================
@@ -614,7 +724,6 @@ body {
   margin-bottom: 12px !important;
 }
 
-/* Khối Ngày Tháng có 2 gạch đứng */
 .date-display-box {
   margin: 12px auto 10px !important;
   display: flex !important;
@@ -656,7 +765,6 @@ body {
   margin: 6px 0 !important;
 }
 
-/* ĐỒNG BỘ DÒNG ÂM LỊCH */
 .lunar-date {
   font-family: var(--font-lora) !important;
   font-size: 1.65rem !important;
@@ -668,7 +776,6 @@ body {
   display: block !important;
 }
 
-/* ĐÓN KHÁCH & KHAI TIỆC */
 .timeline-schedule-box {
   display: flex !important;
   justify-content: center !important;
@@ -730,7 +837,6 @@ body {
   margin-top: 4px;
 }
 
-/* KHỐI LỜI MỜI VINH HẠNH */
 .reception-honor-invite {
   margin: 25px auto 10px;
   max-width: 480px;
@@ -1365,7 +1471,7 @@ body {
 }
 
 /* =========================================================
-   RESPONSIVE CHO MOBILE (TĂNG KÍCH THƯỚC CARD ẢNH CƯỚI TO RÕ)
+   RESPONSIVE CHO MOBILE (NÂNG SIZE CARD COVERFLOW TO RÕ)
    ========================================================= */
 @media (max-width: 768px) {
   .album-section,
@@ -1390,9 +1496,9 @@ body {
     margin-bottom: 22px !important;
   }
 
-  /* NÂNG CHIỀU CAO WRAPPER VÀ CARD ẢNH LÊN TO RÕ RÀNG */
+  /* KÍCH THƯỚC CARD ẢNH CƯỚI TO RÕ TRÊN MOBILE */
   .coverflow-wrapper {
-    height: 350px !important;        /* Nâng từ 310px lên 350px */
+    height: 350px !important;
     -webkit-perspective: 700px !important;
     perspective: 700px !important;
   }
@@ -1401,13 +1507,12 @@ body {
     transform-style: preserve-3d !important;
   }
   .coverflow-card {
-    width: 195px !important;         /* Tăng từ 165px lên 195px */
-    height: 295px !important;        /* Tăng từ 255px lên 295px */
+    width: 195px !important;
+    height: 295px !important;
     border-radius: 16px !important;
     box-shadow: 0 14px 30px rgba(0, 0, 0, 0.24) !important;
   }
 
-  /* CÂN CHỈNH KHOẢNG CÁCH DỊCH CHUYỂN PHÙ HỢP CỠ CARD MỚI */
   .coverflow-card.active {
     -webkit-transform: perspective(700px) translateX(0) translateZ(0) rotateY(0deg) scale(1) !important;
     transform: perspective(700px) translateX(0) translateZ(0) rotateY(0deg) scale(1) !important;
@@ -1444,6 +1549,19 @@ body {
 
   .btn-prev { left: 4px !important; width: 34px !important; height: 34px !important; }
   .btn-next { right: 4px !important; width: 34px !important; height: 34px !important; }
+
+  /* LIGHTBOX RESPONSIVE MOBILE */
+  .lightbox-modal { padding: 10px 0 16px 0 !important; }
+  .lb-image-container img { max-width: 95%; border-radius: 14px; }
+  .lb-nav-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
+    background: rgba(0, 0, 0, 0.25);
+  }
+  .lb-btn-prev { left: 8px; }
+  .lb-btn-next { right: 8px; }
+  .lb-thumb-item { width: 50px; height: 62px; }
 
   /* SECTION TIỆC CƯỚI */
   .reception-details-section { padding: 45px 15px 40px 15px !important; }
