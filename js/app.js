@@ -25,6 +25,101 @@ document.addEventListener('DOMContentLoaded', () => {
     customAlert.classList.add('active');
   }
 
+  // --- HỆ THỐNG TỰ ĐỘNG CUỘN TRANG (CHUẨN 60FPS/120FPS KHÔNG GIẬT CỤC) ---
+  let autoScrollRafId = null;
+  let isAutoScrolling = false;
+  let isScrollPaused = false;
+  let wheelResumeTimer = null;
+  let currentScrollY = window.scrollY || window.pageYOffset || 0;
+  const scrollSpeed = 1.4; // Tốc độ trôi êm dịu, không giật hình
+
+  function stepAutoScroll() {
+    if (!isAutoScrolling) return;
+
+    if (!isScrollPaused) {
+      currentScrollY += scrollSpeed;
+      
+      // Cuộn tức thời bằng tọa độ thực float, triệt tiêu xung đột với scroll-behavior: smooth
+      window.scrollTo({
+        top: currentScrollY,
+        left: 0,
+        behavior: 'instant'
+      });
+
+      // Kiểm tra chạm đáy trang
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      if (currentScrollY >= maxScroll - 10) {
+        stopAutoScroll();
+        return;
+      }
+    }
+
+    autoScrollRafId = requestAnimationFrame(stepAutoScroll);
+  }
+
+  function startAutoScroll() {
+    if (isAutoScrolling) return;
+    isAutoScrolling = true;
+    isScrollPaused = false;
+    currentScrollY = window.scrollY || window.pageYOffset || 0;
+    autoScrollRafId = requestAnimationFrame(stepAutoScroll);
+  }
+
+  function stopAutoScroll() {
+    isAutoScrolling = false;
+    if (autoScrollRafId) {
+      cancelAnimationFrame(autoScrollRafId);
+      autoScrollRafId = null;
+    }
+  }
+
+  // Đồng bộ lại toạ độ khi người dùng chủ động tương tác
+  function syncScrollPos() {
+    currentScrollY = window.scrollY || window.pageYOffset || 0;
+  }
+
+  // Chạm giữ (điện thoại) hoặc bấm đè chuột (máy tính) để đứng yên giống mục lời chúc
+  window.addEventListener('touchstart', () => {
+    if (window.isLightboxZoomed) return;
+    isScrollPaused = true;
+    syncScrollPos();
+  }, { passive: true });
+
+  window.addEventListener('touchend', () => {
+    syncScrollPos();
+    isScrollPaused = false;
+  }, { passive: true });
+
+  window.addEventListener('mousedown', () => {
+    isScrollPaused = true;
+    syncScrollPos();
+  });
+
+  window.addEventListener('mouseup', () => {
+    syncScrollPos();
+    isScrollPaused = false;
+  });
+
+  // Khi lăn chuột: Tạm dừng để đọc, sau khi dừng lăn chuột 1.2s thì tự động cuộn tiếp
+  window.addEventListener('wheel', () => {
+    isScrollPaused = true;
+    syncScrollPos();
+    clearTimeout(wheelResumeTimer);
+    wheelResumeTimer = setTimeout(() => {
+      const lbActive = document.getElementById('lightboxModal')?.classList.contains('active');
+      if (!lbActive) {
+        syncScrollPos();
+        isScrollPaused = false;
+      }
+    }, 1200);
+  }, { passive: true });
+
+  function scheduleAutoScroll() {
+    setTimeout(() => {
+      startAutoScroll();
+    }, 3000); // Đợi đúng 3 giây sau khi mở màn hình chính
+  }
+
   // 3. Audio & Mở Thiệp Controller
   const audioPlayer = document.getElementById('audioPlayer');
   const musicToggle = document.getElementById('musicToggle');
@@ -68,6 +163,9 @@ document.addEventListener('DOMContentLoaded', () => {
         musicToggle?.classList.add('needs-tap');
       });
     }
+
+    // Bắt đầu đếm 3s để tự động cuộn sau khi mở thiệp
+    scheduleAutoScroll();
   });
 
   // 4. Countdown Timer (12/12/2026)
@@ -146,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Sanitize & Validate Client Boundaries
       const nameVal = (nameInput?.value || '').trim().slice(0, 50);
       const attendingVal = attendingSelect?.value === 'true';
-      const msgVal = (msgInput?.value || '').trim().slice(0, 300);
+      const msgVal = (msgInput?.value || '').trim().slice(0, 1000);
 
       let guestsVal = 1;
       if (attendingVal && guestsSelect) {
@@ -170,7 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
       loadingOverlay?.classList.add('active');
       if (submitBtn) submitBtn.disabled = true;
 
-      // Format chuẩn xác: HH:mm:ss DD/MM/YYYY (ví dụ: 18:49:06 15/10/2026)
+      // Format chuẩn xác: HH:mm:ss DD/MM/YYYY
       const now = new Date();
       const hours = String(now.getHours()).padStart(2, '0');
       const minutes = String(now.getMinutes()).padStart(2, '0');
@@ -207,7 +305,7 @@ document.addEventListener('DOMContentLoaded', () => {
             body: JSON.stringify({ 
               ...payload, 
               id: newRef.key,
-              timestamp: Date.now() // Timestamp số thực tế cho Apps Script
+              timestamp: Date.now()
             })
           }).catch(err => console.warn('[AppsScript] Async push failed:', err));
 
@@ -413,6 +511,7 @@ document.addEventListener('DOMContentLoaded', () => {
           openGalleryAt(idx);
           lbModal?.classList.add('active');
           document.body.style.overflow = 'hidden';
+          isScrollPaused = true; // Dừng cuộn khi vào Lightbox
         } else {
           goToSlide(idx);
         }
@@ -475,6 +574,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     lbModal?.classList.remove('active');
     document.body.style.overflow = '';
+    syncScrollPos();
+    isScrollPaused = false; // Tiếp tục cuộn khi đóng album
   }
 
   lbBtnClose?.addEventListener('click', closeLightbox);
@@ -520,10 +621,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 10. Modal Hộp Quà Mừng
   const giftModal = document.getElementById('giftModal');
-  document.getElementById('openGiftModal')?.addEventListener('click', () => giftModal?.classList.add('active'));
-  document.getElementById('closeModal')?.addEventListener('click', () => giftModal?.classList.remove('active'));
+  document.getElementById('openGiftModal')?.addEventListener('click', () => {
+    giftModal?.classList.add('active');
+    isScrollPaused = true;
+  });
+  document.getElementById('closeModal')?.addEventListener('click', () => {
+    giftModal?.classList.remove('active');
+    syncScrollPos();
+    isScrollPaused = false;
+  });
   giftModal?.addEventListener('click', (e) => {
-    if (e.target === giftModal) giftModal.classList.remove('active');
+    if (e.target === giftModal) {
+      giftModal.classList.remove('active');
+      syncScrollPos();
+      isScrollPaused = false;
+    }
   });
 
   // Khởi tạo Album 3D ban đầu

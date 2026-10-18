@@ -15,6 +15,9 @@ function escapeHTML(str) {
   );
 }
 
+// =========================================================
+// 1. FLOATING TICKER (TỰ ĐỘNG CHẠY BÌNH THƯỜNG)
+// =========================================================
 function renderTicker(item) {
   const box = document.getElementById('tickerContentBox');
   if (!box || !item) return;
@@ -34,7 +37,7 @@ function renderTicker(item) {
 function startTickerLoop() {
   if (wishesQueue.length === 0) return;
   if (tickerTimer) clearInterval(tickerTimer);
-  renderTicker(wishesQueue[0]);
+  renderTicker(wishesQueue[currentWishIndex]);
   
   tickerTimer = setInterval(() => {
     currentWishIndex = (currentWishIndex + 1) % wishesQueue.length;
@@ -42,6 +45,9 @@ function startTickerLoop() {
   }, 4000);
 }
 
+// =========================================================
+// 2. KHUNG LỜI CHÚC: CUỘN VÔ HẠN 2 CHIỀU (LÊN / XUỐNG ĐỀU VÔ HẠN)
+// =========================================================
 function renderCardHTML(w) {
   return `
     <div class="wish-scroll-card">
@@ -52,6 +58,93 @@ function renderCardHTML(w) {
       <div class="wish-message-body">${escapeHTML(w.message)}</div>
     </div>
   `;
+}
+
+let marqueeRafId = null;
+let isMarqueePaused = false;
+let marqueeResumeTimer = null;
+
+function setupSeamlessInfiniteScroller(scrollWrapper) {
+  if (marqueeRafId) {
+    cancelAnimationFrame(marqueeRafId);
+    marqueeRafId = null;
+  }
+
+  const scrollSpeed = 0.65; // Tốc độ tự trôi nhẹ nhàng
+
+  // 1 block chiếm đúng 1/3 tổng chiều dài scrollHeight (vì có 3 khối bản sao)
+  function getSingleBlockHeight() {
+    return scrollWrapper.scrollHeight / 3;
+  }
+
+  // Khởi tạo vị trí đứng ngay đầu khối ở giữa (block 2)
+  requestAnimationFrame(() => {
+    const single = getSingleBlockHeight();
+    if (single > 0 && scrollWrapper.scrollTop < 10) {
+      scrollWrapper.scrollTop = single;
+    }
+  });
+
+  // Cơ chế tái định vị vô hạn 2 chiều
+  function checkBoundaryLoop() {
+    const single = getSingleBlockHeight();
+    if (single <= 0) return;
+
+    // Khi cuộn xuống sâu chạm vào khối 3 -> kéo ngược về khối 2
+    if (scrollWrapper.scrollTop >= single * 2) {
+      scrollWrapper.scrollTop -= single;
+    } 
+    // Khi cuộn ngược lên trên đụng vào khối 1 -> đẩy xuống khối 2
+    else if (scrollWrapper.scrollTop <= 10) {
+      scrollWrapper.scrollTop += single;
+    }
+  }
+
+  function stepMarquee() {
+    if (!isMarqueePaused) {
+      scrollWrapper.scrollTop += scrollSpeed;
+      checkBoundaryLoop();
+    }
+    marqueeRafId = requestAnimationFrame(stepMarquee);
+  }
+
+  marqueeRafId = requestAnimationFrame(stepMarquee);
+
+  function pause() {
+    isMarqueePaused = true;
+    clearTimeout(marqueeResumeTimer);
+  }
+
+  function resume(delay = 1200) {
+    clearTimeout(marqueeResumeTimer);
+    marqueeResumeTimer = setTimeout(() => {
+      checkBoundaryLoop();
+      isMarqueePaused = false;
+    }, delay);
+  }
+
+  if (!scrollWrapper.dataset.infiniteBound) {
+    scrollWrapper.dataset.infiniteBound = '1';
+
+    // Bắt sự kiện cuộn liên tục để luôn đảm bảo không bao giờ kịch đáy/đỉnh
+    scrollWrapper.addEventListener('scroll', () => {
+      checkBoundaryLoop();
+    }, { passive: true });
+
+    // Thao tác vuốt ngón tay (Mobile touch)
+    scrollWrapper.addEventListener('touchstart', pause, { passive: true });
+    scrollWrapper.addEventListener('touchend', () => resume(1200), { passive: true });
+    scrollWrapper.addEventListener('touchcancel', () => resume(1200), { passive: true });
+
+    // Thao tác lăn chuột (Desktop wheel)
+    scrollWrapper.addEventListener('wheel', () => {
+      pause();
+      resume(1200);
+    }, { passive: true });
+
+    scrollWrapper.addEventListener('mouseenter', pause);
+    scrollWrapper.addEventListener('mouseleave', () => resume(600));
+  }
 }
 
 function refreshWishesDOM() {
@@ -70,30 +163,31 @@ function refreshWishesDOM() {
   }
   lastRenderedSignature = currentSignature;
 
-  if (wishesQueue.length <= 3) {
+  if (wishesQueue.length <= 2) {
     container.innerHTML = `<div class="marquee-static-track">${wishesQueue.map(renderCardHTML).join('')}</div>`;
     return;
   }
 
   const cardsHtml = wishesQueue.map(renderCardHTML).join('');
-  const duration = Math.max(16, wishesQueue.length * 5);
 
+  // Nhân bản thành 3 khối (A + A + A) để triệt tiêu hoàn toàn điểm chết kịch đáy
   container.innerHTML = `
-    <div class="marquee-wishes-wrapper" style="overflow: hidden; position: relative; height: 100%;">
-      <div class="marquee-track" style="animation-duration: ${duration}s;">
+    <div class="marquee-wishes-wrapper" style="overflow-y: auto !important; height: 100%; position: relative; scrollbar-width: none; -ms-overflow-style: none; -webkit-overflow-scrolling: touch;">
+      <div class="marquee-track" style="animation: none !important;">
         ${cardsHtml}
       </div>
-      <div class="marquee-track" aria-hidden="true" style="animation-duration: ${duration}s;">
+      <div class="marquee-track" aria-hidden="true" style="animation: none !important;">
+        ${cardsHtml}
+      </div>
+      <div class="marquee-track" aria-hidden="true" style="animation: none !important;">
         ${cardsHtml}
       </div>
     </div>
   `;
 
-  if (!container.dataset.touchBound) {
-    container.dataset.touchBound = "1";
-    container.addEventListener('touchstart', () => container.classList.add('is-paused'), { passive: true });
-    container.addEventListener('touchend', () => container.classList.remove('is-paused'), { passive: true });
-    container.addEventListener('touchcancel', () => container.classList.remove('is-paused'), { passive: true });
+  const scrollWrapper = container.querySelector('.marquee-wishes-wrapper');
+  if (scrollWrapper) {
+    setupSeamlessInfiniteScroller(scrollWrapper);
   }
 }
 
@@ -105,7 +199,9 @@ function scheduleUIRefresh() {
   }, 50);
 }
 
-// 1. Lắng nghe Firebase Realtime danh sách lời chúc (RSVP)
+// =========================================================
+// 3. FIREBASE REALTIME LẮNG NGHE LỜI CHÚC (RSVP)
+// =========================================================
 if (typeof wishesRef !== 'undefined' && wishesRef) {
   wishesRef.limitToLast(MAX_WISHES_LIMIT).on('child_added', (snapshot) => {
     const item = snapshot.val();
@@ -138,7 +234,9 @@ if (typeof wishesRef !== 'undefined' && wishesRef) {
   });
 }
 
-// 2. Lắng nghe Realtime Album ảnh và Tích hợp Zoom & Pan 10x
+// =========================================================
+// 4. REALTIME ALBUM & ZOOM/PAN 10X
+// =========================================================
 window.addEventListener('DOMContentLoaded', () => {
   if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length > 0) {
     const albumRef = firebase.database().ref('album_photos');
@@ -180,8 +278,7 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // --- HỆ THỐNG ZOOM & PAN CHUẨN XÁC (FIX LỖI THU NHỎ & LỖI NHẢY ẢNH) ---
-  // --- HỆ THỐNG ZOOM & PAN HOÀN CHỈNH CHO CẢ PC (CHUỘT) & MOBILE (TOUCH) ---
+  // --- HỆ THỐNG ZOOM & PAN CHUẨN XÁC CHO CẢ PC & MOBILE ---
   const zoomImg = document.getElementById('lightboxZoomImg');
   const lbStage = document.getElementById('lbMainStage');
 
@@ -194,13 +291,12 @@ window.addEventListener('DOMContentLoaded', () => {
     let initialDistance = 0;
     let initialScale = 1;
     let lastTapTime = 0;
-    let hasMoved = false; // Phân biệt giữa click phóng to và kéo rê ảnh
+    let hasMoved = false;
 
     const MIN_SCALE = 1;
     const MAX_SCALE = 10;
     const DOUBLE_TAP_SCALE = 3.0;
 
-    // Chặn hoàn toàn hành vi kéo ảnh sinh ghost thumbnail của trình duyệt
     zoomImg.ondragstart = (e) => e.preventDefault();
     zoomImg.addEventListener('dragstart', (e) => e.preventDefault());
 
@@ -225,11 +321,7 @@ window.addEventListener('DOMContentLoaded', () => {
       applyTransform(true);
     };
 
-    // ==========================================
-    // 1. ĐIỀU KHIỂN BẰNG CHUỘT TRÊN MÁY TÍNH (PC)
-    // ==========================================
-
-    // Cuộn chuột phóng to / thu nhỏ tự do từ 1x đến 10x
+    // Điều khiển bằng chuột trên máy tính (PC)
     lbStage.addEventListener('wheel', (e) => {
       e.preventDefault();
       const zoomStep = e.deltaY < 0 ? 0.35 : -0.35;
@@ -242,9 +334,7 @@ window.addEventListener('DOMContentLoaded', () => {
       applyTransform(false);
     }, { passive: false });
 
-    // Bắt đầu bấm chuột xuống
     lbStage.addEventListener('mousedown', (e) => {
-      // Chỉ nhận chuột trái và khi ảnh đang ở trạng thái zoom
       if (e.button === 0 && currentScale > 1.05) {
         e.preventDefault();
         isDragging = true;
@@ -255,7 +345,6 @@ window.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Rê chuột kéo ảnh đi khắp màn hình
     window.addEventListener('mousemove', (e) => {
       if (!isDragging || currentScale <= 1.05) return;
       e.preventDefault();
@@ -265,18 +354,15 @@ window.addEventListener('DOMContentLoaded', () => {
       applyTransform(false);
     });
 
-    // Thả chuột
-    window.addEventListener('mouseup', (e) => {
+    window.addEventListener('mouseup', () => {
       if (isDragging) {
         isDragging = false;
         applyTransform(false);
       }
     });
 
-    // Click chuột để Phóng to 3x hoặc Thu nhỏ về 1x (nếu không phải đang kéo ảnh)
-    zoomImg.addEventListener('click', (e) => {
-      if (hasMoved) return; // Nếu vừa kéo thả chuột thì không kích hoạt click zoom
-      
+    zoomImg.addEventListener('click', () => {
+      if (hasMoved) return;
       if (currentScale > 1.2) {
         window.resetLightboxZoom();
       } else {
@@ -287,11 +373,7 @@ window.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // ==========================================
-    // 2. ĐIỀU KHIỂN CẢM ỨNG TRÊN ĐIỆN THOẠI (TOUCH)
-    // ==========================================
-
-    // Double tap phóng to 3x hoặc thu nhỏ
+    // Điều khiển cảm ứng trên điện thoại (Touch)
     lbStage.addEventListener('touchend', (e) => {
       if (e.changedTouches.length === 1 && !isPinching) {
         const now = Date.now();
