@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' 
+      https://www.gstatic.com 
+      https://apis.google.com 
+      https://*.googleapis.com 
+      https://*.google.com 
+      https://*.firebasedatabase.app 
+      https://*.firebaseio.com;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+    font-src 'self' https://fonts.gstatic.com data:;
+    img-src 'self' https: data: blob:;
+    frame-src 'self' https://accounts.google.com https://*.firebaseapp.com https://*.firebasedatabase.app;
+    child-src 'self' blob: https://accounts.google.com https://*.firebaseapp.com;
+    worker-src 'self' blob:;
+    connect-src 'self' 
+      https://*.firebaseio.com 
+      wss://*.firebaseio.com 
+      https://*.firebasedatabase.app 
+      wss://*.firebasedatabase.app 
+      https://wedding-tue-trang-default-rtdb.asia-southeast1.firebasedatabase.app
+      wss://wedding-tue-trang-default-rtdb.asia-southeast1.firebasedatabase.app
+      https://*.googleapis.com 
+      https://accounts.google.com;
+  ">
+  <title>Admin Dashboard | Quản Lý Album Ảnh Cưới</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #141b16;
+      --card-bg: #1e2721;
+      --card-inner: #26332a;
+      --text-main: #EBF1E8;
+      --text-muted: #8FA693;
+      --accent: #5c8d67;
+      --accent-hover: #4a7553;
+      --border: rgba(255, 255, 255, 0.1);
+      --danger: #ff6b6b;
+      --success: #51cf66;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      font-family: 'Montserrat', sans-serif;
+      color: var(--text-main);
+      padding: 30px 15px;
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .panel-box {
+      width: 100%;
+      max-width: 760px;
+      background: var(--card-bg);
+      border-radius: 18px;
+      padding: 35px 28px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border);
+    }
+    h2 {
+      font-family: 'Lora', serif;
+      color: var(--text-main);
+      font-size: 1.8rem;
+      text-align: center;
+      margin-bottom: 6px;
+    }
+    p.sub-title {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      margin-bottom: 25px;
+    }
+    #fatalErrorBanner {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 999999;
+      background: #c0392b;
+      color: #fff;
+      padding: 14px 16px;
+      font: 600 13px/1.6 'Montserrat', sans-serif;
+      text-align: center;
+    }
+    #loginSection {
+      max-width: 380px;
+      margin: 0 auto;
+      text-align: center;
+      padding: 20px 0;
+    }
+    .btn-google-login {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+      background: #FFFFFF;
+      color: #3c4043;
+      border: 1px solid #dadce0;
+      border-radius: 10px;
+      padding: 13px 20px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      transition: all 0.2s;
+    }
+    .btn-google-login:hover {
+      background: #f8f9fa;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    }
+    .btn-google-login svg {
+      width: 20px;
+      height: 20px;
+    }
+    #dashboardSection {
+      display: none;
+    }
+    .user-badge-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 15px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+    .btn-logout {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--danger);
+      padding: 6px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.8rem;
+      transition: all 0.2s;
+    }
+    .btn-logout:hover {
+      background: var(--danger);
+      color: #fff;
+    }
+    .img-list-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+      max-height: 480px;
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+    .img-item-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--card-inner);
+      border: 1px solid var(--border);
+      padding: 10px 14px;
+      border-radius: 12px;
+    }
+    .row-index {
+      font-weight: 700;
+      color: var(--accent);
+      min-width: 24px;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+    .img-preview {
+      width: 52px;
+      height: 68px;
+      border-radius: 8px;
+      object-fit: cover;
+      background: #000;
+      flex-shrink: 0;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .img-input-box { flex-grow: 1; }
+    .form-control {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: #fff;
+      font-size: 0.9rem;
+      outline: none;
+    }
+    .form-control:focus { border-color: var(--accent); }
+    .btn-delete-row {
+      background: none;
+      border: 1px solid rgba(255, 107, 107, 0.3);
+      color: var(--danger);
+      font-size: 1.2rem;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .btn-delete-row:hover { background: var(--danger); color: #fff; }
+    .btn-action {
+      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border: none;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      transition: all 0.2s;
+    }
+    .btn-add {
+      background: transparent;
+      color: var(--accent);
+      border: 1.5px dashed var(--accent);
+      margin-bottom: 12px;
+    }
+    .btn-add:hover { background: rgba(92, 141, 103, 0.1); }
+    .btn-save { background: var(--accent); color: #fff; }
+    .btn-save:hover { background: var(--accent-hover); }
+    .btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
+    .status-msg {
+      margin-top: 15px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 0.9rem;
+      word-break: break-word;
+    }
+    .status-msg.success { color: var(--success); }
+    .status-msg.error { color: var(--danger); }
+  </style>
+</head>
+<body>
+
+  <div id="fatalErrorBanner"></div>
+
+  <div class="panel-box">
+    <!-- KHUNG ĐĂNG NHẬP -->
+    <div id="loginSection">
+      <h2>HỆ THỐNG QUẢN TRỊ</h2>
+      <p class="sub-title">Xác thực Google để cấp quyền quản trị album ảnh</p>
+
+      <button type="button" class="btn-google-login" id="btnGoogleLogin">
+        <svg viewBox="0 0 48 48">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+        </svg>
+        <span>Đăng nhập với Google</span>
+      </button>
+      <div class="status-msg" id="loginStatus"></div>
+    </div>
+
+    <!-- KHUNG QUẢN LÝ -->
+    <div id="dashboardSection">
+      <div class="user-badge-bar">
+        <span>Admin: <strong id="adminEmailBadge">...</strong></span>
+        <button type="button" class="btn-logout" id="btnLogout">Đăng Xuất</button>
+      </div>
+
+      <h2>QUẢN LÝ ALBUM ẢNH CƯỚI</h2>
+      <p class="sub-title">Dán link Google Drive hoặc URL ảnh trực tiếp vào ô bên dưới</p>
+
+      <div class="img-list-group" id="imgListGroup"></div>
+
+      <button type="button" class="btn-action btn-add" id="btnAddRow">+ Thêm Ảnh Mới</button>
+      <button type="button" class="btn-action btn-save" id="btnSave">Lưu Thay Đổi Lên Website</button>
+
+      <div class="status-msg" id="dashStatus"></div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script src="js/firebase-config.js"></script>
+
+  <script>
+  'use strict';
+
+  function showFatalError() {
+    const banner = document.getElementById('fatalErrorBanner');
+    if (banner) {
+      banner.style.display = 'block';
+      banner.innerHTML = '⚠ Đã xảy ra lỗi khởi tạo hệ thống quản trị.';
+    }
+  }
+
+  // Hàm tự động bóc tách ID sau /d/ từ link Google Drive
+  function convertGoogleDriveLink(url) {
+    if (!url || typeof url !== 'string') return url;
+    let cleanUrl = url.trim();
+    const matchD = cleanUrl.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if (matchD && matchD[1]) {
+      return `https://lh3.googleusercontent.com/d/${matchD[1]}`;
+    }
+    return cleanUrl;
+  }
+
+  try {
+    if (typeof firebase === 'undefined' || !firebase.apps || firebase.apps.length === 0) {
+      throw new Error('Firebase SDK Error');
+    }
+
+    const auth = firebase.auth();
+    const db = firebase.database();
+    const albumRef = db.ref('album_photos');
+    const probeRef = db.ref('admin_probe'); // Trở lại node admin_probe chính hãng theo Rules của mày
+
+    const loginSection = document.getElementById('loginSection');
+    const dashboardSection = document.getElementById('dashboardSection');
+    const btnGoogleLogin = document.getElementById('btnGoogleLogin');
+    const loginStatus = document.getElementById('loginStatus');
+
+    const adminEmailBadge = document.getElementById('adminEmailBadge');
+    const btnLogout = document.getElementById('btnLogout');
+    const imgListGroup = document.getElementById('imgListGroup');
+    const btnAddRow = document.getElementById('btnAddRow');
+    const btnSave = document.getElementById('btnSave');
+    const dashStatus = document.getElementById('dashStatus');
+
+    function isValidHttpUrl(string) {
+      try {
+        const url = new URL(string);
+        return url.protocol === "http:" || url.protocol === "https:";
+      } catch (_) {
+        return false;
+      }
+    }
+
+    function reindexRows() {
+      const rows = imgListGroup.querySelectorAll('.img-item-row');
+      rows.forEach((row, i) => {
+        const idxEl = row.querySelector('.row-index');
+        if (idxEl) idxEl.textContent = '#' + (i + 1);
+      });
+    }
+
+    // Xác thực quyền hạn chuẩn xác qua admin_probe
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        loginStatus.className = 'status-msg';
+        loginStatus.textContent = 'Đang kiểm tra đặc quyền quản trị...';
+
+        probeRef.once('value')
+          .then(() => {
+            loginStatus.textContent = '';
+            loginSection.style.display = 'none';
+            dashboardSection.style.display = 'block';
+            adminEmailBadge.textContent = user.email;
+            loadAlbumData();
+          })
+          .catch(() => {
+            auth.signOut().then(() => {
+              loginSection.style.display = 'block';
+              dashboardSection.style.display = 'none';
+              loginStatus.className = 'status-msg error';
+              loginStatus.textContent = 'Truy cập bị từ chối: Tài khoản không có đặc quyền quản trị.';
+            });
+          });
+      } else {
+        loginSection.style.display = 'block';
+        dashboardSection.style.display = 'none';
+      }
+    }, () => {
+      showFatalError();
+    });
+
+    // Ép buộc Token chỉ lưu trên RAM (Persistence NONE)
+    btnGoogleLogin.addEventListener('click', () => {
+      loginStatus.className = 'status-msg';
+      loginStatus.textContent = 'Đang thiết lập phiên làm việc...';
+
+      auth.setPersistence(firebase.auth.Auth.Persistence.NONE)
+        .then(() => {
+          loginStatus.textContent = 'Đang kết nối xác thực Google...';
+          const provider = new firebase.auth.GoogleAuthProvider();
+          return auth.signInWithPopup(provider);
+        })
+        .then(() => {
+          loginStatus.textContent = '';
+        })
+        .catch((err) => {
+          loginStatus.className = 'status-msg error';
+          if (err && err.code === 'auth/unauthorized-domain') {
+            loginStatus.textContent = 'Domain hiện tại chưa được cấp phép trên Firebase.';
+          } else if (err && err.code === 'auth/popup-blocked') {
+            loginStatus.textContent = 'Trình duyệt đang chặn Popup đăng nhập.';
+          } else {
+            loginStatus.textContent = 'Xác thực không thành công. Vui lòng thử lại!';
+          }
+        });
+    });
+
+    btnLogout.addEventListener('click', () => {
+      auth.signOut();
+    });
+
+    function createRow(url = '') {
+      const row = document.createElement('div');
+      row.className = 'img-item-row';
+      row.innerHTML = `
+        <span class="row-index">#</span>
+        <img class="img-preview" src="${isValidHttpUrl(url) ? url : 'https://via.placeholder.com/150x200?text=No+Img'}" onerror="this.src='https://via.placeholder.com/150x200?text=Loi+Anh'" />
+        <div class="img-input-box">
+          <input type="text" class="form-control img-url-input" placeholder="Dán link Google Drive hoặc https://..." value="${url.replace(/"/g, '&quot;')}" />
+        </div>
+        <button type="button" class="btn-delete-row" title="Xóa ảnh này">&times;</button>
+      `;
+
+      const input = row.querySelector('.img-url-input');
+      const preview = row.querySelector('.img-preview');
+      
+      input.addEventListener('input', () => {
+        const rawVal = input.value.trim();
+        const convertedVal = convertGoogleDriveLink(rawVal);
+        preview.src = isValidHttpUrl(convertedVal) ? convertedVal : 'https://via.placeholder.com/150x200?text=No+Img';
+      });
+
+      row.querySelector('.btn-delete-row').addEventListener('click', () => {
+        row.remove();
+        reindexRows();
+      });
+
+      imgListGroup.appendChild(row);
+      reindexRows();
+    }
+
+    function loadAlbumData() {
+      dashStatus.className = 'status-msg';
+      dashStatus.textContent = 'Đang tải danh sách ảnh...';
+      albumRef.once('value').then(snapshot => {
+        const data = snapshot.val();
+        imgListGroup.innerHTML = '';
+        dashStatus.textContent = '';
+        if (Array.isArray(data) && data.length > 0) {
+          data.forEach(url => createRow(url));
+        } else {
+          for (let i = 0; i < 8; i++) createRow('');
+        }
+      }).catch(() => {
+        dashStatus.className = 'status-msg error';
+        dashStatus.textContent = 'Không thể tải dữ liệu album lúc này.';
+      });
+    }
+
+    btnAddRow.addEventListener('click', () => createRow(''));
+
+    btnSave.addEventListener('click', () => {
+      const inputs = document.querySelectorAll('.img-url-input');
+      const urls = [];
+
+      for (let inp of inputs) {
+        const val = inp.value.trim();
+        if (val) {
+          const finalUrl = convertGoogleDriveLink(val);
+          if (!isValidHttpUrl(finalUrl)) {
+            dashStatus.className = 'status-msg error';
+            dashStatus.textContent = `URL hoặc link Google Drive không hợp lệ!`;
+            inp.focus();
+            return;
+          }
+          urls.push(finalUrl);
+        }
+      }
+
+      if (urls.length === 0) {
+        dashStatus.className = 'status-msg error';
+        dashStatus.textContent = 'Vui lòng nhập ít nhất 1 link ảnh hợp lệ!';
+        return;
+      }
+
+      btnSave.disabled = true;
+      dashStatus.className = 'status-msg';
+      dashStatus.textContent = 'Đang ghi dữ liệu lên Firebase...';
+
+      albumRef.set(urls)
+        .then(() => {
+          dashStatus.className = 'status-msg success';
+          dashStatus.textContent = '✓ Cập nhật thành công! Trang thiệp cưới đã nhận ảnh mới.';
+        })
+        .catch(() => {
+          dashStatus.className = 'status-msg error';
+          dashStatus.textContent = 'Lỗi: Từ chối quyền ghi dữ liệu!';
+        })
+        .finally(() => {
+          btnSave.disabled = false;
+        });
+    });
+
+  } catch (_) {
+    showFatalError();
+  }
+  </script>
+</body>
+</html>

@@ -1163,18 +1163,19 @@ body {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding-bottom: 14px;
+  padding-bottom: 0px !important;
   flex-shrink: 0;
   animation: marqueeScroll linear infinite;
   will-change: transform;
 }
+
 .infinite-wishes-scroll-box:hover .marquee-track,
 .infinite-wishes-scroll-box.is-paused .marquee-track {
   animation-play-state: paused !important;
 }
 @keyframes marqueeScroll {
   0% { transform: translateY(0); }
-  100% { transform: translateY(-100%); }
+  100% { transform: translateY(calc(-100% - 14px)); }
 }
 .marquee-static-track {
   display: flex;

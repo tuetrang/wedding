@@ -1,17 +1,28 @@
-// --- CẤU HÌNH FIREBASE REALTIME DATABASE ---
 const firebaseConfig = {
-  // Thay URL:
-  databaseURL: "https://wedding-tue-trang-default-rtdb.asia-southeast1.firebasedatabase.app"
+  apiKey: "AIzaSyDx1qlBYwO8wcCZSea7p59G5AzALtxowSE",
+  authDomain: "wedding-tue-trang.firebaseapp.com",
+  databaseURL: "https://wedding-tue-trang-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "wedding-tue-trang",
+  storageBucket: "wedding-tue-trang.firebasestorage.app",
+  messagingSenderId: "334588024809",
+  appId: "1:334588024809:web:53a5e782af631506fadd78"
 };
 
 let wishesRef = null;
-if (firebaseConfig.databaseURL && firebaseConfig.databaseURL !== "FIREBASE_URL") {
-  try {
-    firebase.initializeApp(firebaseConfig);
-    wishesRef = firebase.database().ref('rsvp');
-  } catch (e) {
-    console.error("Lỗi khởi tạo Firebase:", e);
+let firebaseReady = false;
+
+try {
+  if (typeof firebase === 'undefined') {
+    throw new Error('SDK Firebase chưa tải được.');
   }
-} else {
-  console.warn("Chưa cấu hình Firebase URL trong js/firebase-config.js");
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+  if (firebaseConfig.databaseURL) {
+    wishesRef = firebase.database().ref('rsvp');
+  }
+  firebaseReady = true;
+} catch (e) {
+  firebaseReady = false;
+  console.error('[firebase-config] Lỗi khởi tạo Firebase:', e.message || e);
 }

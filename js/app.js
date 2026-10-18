@@ -1,26 +1,31 @@
-// --- LOGIC GIAO DIỆN CHÍNH & SUBMIT SONG SONG (FIREBASE + GOOGLE APPS SCRIPT) ---
+// js/app.js
+// --- LOGIC GIAO DIỆN CHÍNH & XỬ LÝ SUBMIT DUY NHẤT (FIREBASE + APPS SCRIPT) ---
+'use strict';
+
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx7aYHQKPQQfAoi56u20K0iHxpht7EzXnHabE8DiCmk3YLfMPryUuyqPxIhGAKXbVgy/exec";
+const SUBMIT_THROTTLE_MS = 30000; // 30s rate limit phía client
 
 document.addEventListener('DOMContentLoaded', () => {
-  'use strict';
-
-  // Tắt tính năng tự nhớ vị trí cuộn của trình duyệt khi load trang
+  // 1. Tắt tính năng tự nhớ vị trí cuộn của trình duyệt khi load trang
   if ('scrollRestoration' in history) {
     history.scrollRestoration = 'manual';
   }
   window.scrollTo(0, 0);
 
+  // 2. Custom Alert UI Controller
   const customAlert = document.getElementById('customAlert');
   const alertMsg = document.getElementById('alertMsg');
-  document.getElementById('alertOkBtn')?.addEventListener('click', () => customAlert.classList.remove('active'));
+  const alertOkBtn = document.getElementById('alertOkBtn');
+  
+  alertOkBtn?.addEventListener('click', () => customAlert?.classList.remove('active'));
 
   function showAlert(msg) {
     if (!alertMsg || !customAlert) return;
-    alertMsg.textContent = msg;
+    alertMsg.textContent = String(msg);
     customAlert.classList.add('active');
   }
 
-  // --- ÂM THANH & MỞ THIỆP ---
+  // 3. Audio & Mở Thiệp Controller
   const audioPlayer = document.getElementById('audioPlayer');
   const musicToggle = document.getElementById('musicToggle');
   const btnOpen = document.getElementById('btnOpen');
@@ -31,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (audioPlayer.paused) {
       audioPlayer.play().then(() => {
         musicToggle?.classList.add('playing');
-      }).catch(err => console.warn('[audio] Không thể phát:', err));
+      }).catch(err => console.warn('[Audio] Autoplay blocked:', err));
     } else {
       audioPlayer.pause();
       musicToggle?.classList.remove('playing');
@@ -59,13 +64,13 @@ document.addEventListener('DOMContentLoaded', () => {
       audioPlayer.play().then(() => {
         musicToggle?.classList.add('playing');
         musicToggle?.classList.remove('needs-tap');
-      }).catch(error => {
+      }).catch(() => {
         musicToggle?.classList.add('needs-tap');
       });
     }
   });
 
-  // --- COUNTDOWN TIMER (12/12/2026) ---
+  // 4. Countdown Timer (12/12/2026)
   const weddingDate = new Date("2026-12-12T11:30:00+07:00").getTime();
   const elDays = document.getElementById('cdDays');
   const elHours = document.getElementById('cdHours');
@@ -73,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const elSeconds = document.getElementById('cdSeconds');
 
   function updateCountdown() {
-    const now = new Date().getTime();
+    const now = Date.now();
     const distance = weddingDate - now;
 
     if (distance < 0) {
@@ -89,15 +94,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-    if (elDays) elDays.textContent = days < 10 ? "0" + days : days;
-    if (elHours) elHours.textContent = hours < 10 ? "0" + hours : hours;
-    if (elMinutes) elMinutes.textContent = minutes < 10 ? "0" + minutes : minutes;
-    if (elSeconds) elSeconds.textContent = seconds < 10 ? "0" + seconds : seconds;
+    if (elDays) elDays.textContent = days < 10 ? "0" + days : String(days);
+    if (elHours) elHours.textContent = hours < 10 ? "0" + hours : String(hours);
+    if (elMinutes) elMinutes.textContent = minutes < 10 ? "0" + minutes : String(minutes);
+    if (elSeconds) elSeconds.textContent = seconds < 10 ? "0" + seconds : String(seconds);
   }
   setInterval(updateCountdown, 1000);
   updateCountdown();
 
-  // --- XỬ LÝ CHỌN SỐ LƯỢNG KHÁCH ---
+  // 5. Dynamic Guest Selector Controller
   const guestsSelect = document.getElementById('rsvpGuestsSelect');
   const guestsCustom = document.getElementById('rsvpGuestsCustom');
 
@@ -105,82 +110,114 @@ document.addEventListener('DOMContentLoaded', () => {
     guestsSelect.addEventListener('change', () => {
       if (guestsSelect.value === 'other') {
         guestsCustom.style.display = 'block';
+        guestsCustom.required = true;
         guestsCustom.focus();
       } else {
         guestsCustom.style.display = 'none';
+        guestsCustom.required = false;
         guestsCustom.value = '';
       }
     });
   }
 
-  // --- SUBMIT FORM SONG SONG ---
+  // 6. RSVP Form Submission Handler (Single Point of Entry - Anti-Double Submit)
   const rsvpForm = document.getElementById('rsvpForm');
   const loadingOverlay = document.getElementById('loadingOverlay');
+  let isSubmitting = false; // Mutex lock chống Race Condition / Double Click
 
   if (rsvpForm) {
     rsvpForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
+      if (isSubmitting) return;
+
+      // Rate limit kiểm tra client-side
       const lastSubmitTime = localStorage.getItem('lastRsvpSubmit');
-      if (lastSubmitTime && (Date.now() - parseInt(lastSubmitTime, 10)) < 30000) {
-        showAlert("Bạn thao tác quá nhanh. Vui lòng chờ 30 giây!");
+      if (lastSubmitTime && (Date.now() - parseInt(lastSubmitTime, 10)) < SUBMIT_THROTTLE_MS) {
+        showAlert("Bạn thao tác quá nhanh. Vui lòng chờ 30 giây trước khi gửi tiếp!");
         return;
       }
 
       const submitBtn = document.getElementById('btnSubmitRsvp');
-      const nameVal = document.getElementById('nameInput')?.value.trim().slice(0, 50);
-      const attendingVal = document.getElementById('attendingSelect')?.value === 'true';
+      const nameInput = document.getElementById('nameInput');
+      const attendingSelect = document.getElementById('attendingSelect');
+      const msgInput = document.getElementById('msgInput');
+
+      // Sanitize & Validate Client Boundaries
+      const nameVal = (nameInput?.value || '').trim().slice(0, 50);
+      const attendingVal = attendingSelect?.value === 'true';
+      const msgVal = (msgInput?.value || '').trim().slice(0, 300);
 
       let guestsVal = 1;
-      if (guestsSelect) {
+      if (attendingVal && guestsSelect) {
         if (guestsSelect.value === 'other' && guestsCustom) {
           const parsed = parseInt(guestsCustom.value, 10);
-          guestsVal = (!isNaN(parsed) && parsed > 0) ? parsed : 1;
+          guestsVal = (!isNaN(parsed) && parsed >= 1 && parsed <= 50) ? parsed : 1;
         } else {
           guestsVal = parseInt(guestsSelect.value, 10) || 1;
         }
+      } else if (!attendingVal) {
+        guestsVal = 0;
       }
 
-      const msgVal = document.getElementById('msgInput')?.value.trim().slice(0, 300);
-
       if (!nameVal || !msgVal) {
-        showAlert("Vui lòng nhập tên và lời chúc phúc!");
+        showAlert("Vui lòng điền đầy đủ họ tên và lời chúc phúc!");
         return;
       }
 
-      const currentTimeStr = new Date().toLocaleTimeString('vi-VN') + ' ' + new Date().toLocaleDateString('vi-VN');
+      // Khóa Mutex và cập nhật UI State
+      isSubmitting = true;
+      loadingOverlay?.classList.add('active');
+      if (submitBtn) submitBtn.disabled = true;
+
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const year = now.getFullYear();
+
+      const timeStr = `${hours}:${minutes}:${seconds} ${day}/${month}/${year}`;
+
+      // Payload đồng bộ hoàn toàn với Firebase RTDB Security Rules Schema
       const payload = {
         name: nameVal,
         attending: attendingVal,
-        guests: attendingVal ? guestsVal : 0,
+        guests: guestsVal,
         message: msgVal,
-        time: currentTimeStr,
-        timestamp: Date.now(),
+        time: timeStr,
+        timestamp: (typeof firebase !== 'undefined' && firebase.database?.ServerValue) 
+          ? firebase.database.ServerValue.TIMESTAMP 
+          : Date.now(),
         synced: false
       };
-
-      loadingOverlay?.classList.add('active');
-      if (submitBtn) submitBtn.disabled = true;
 
       try {
         if (typeof wishesRef !== 'undefined' && wishesRef) {
           const newRef = wishesRef.push();
           const firebasePromise = newRef.set(payload);
 
+          // Đẩy ngầm sang Google Sheet (Apps Script)
           fetch(SCRIPT_URL, {
             method: 'POST',
             mode: 'no-cors',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...payload, id: newRef.key })
-          }).catch(err => console.warn("Lỗi fetch Sheet:", err));
+            body: JSON.stringify({ 
+              ...payload, 
+              id: newRef.key,
+              timestamp: Date.now() // Timestamp số thực tế cho Apps Script
+            })
+          }).catch(err => console.warn('[AppsScript] Async push failed:', err));
 
           await firebasePromise;
         } else {
+          // Fallback nếu Firebase offline
           await fetch(SCRIPT_URL, {
             method: 'POST',
             mode: 'no-cors',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            body: JSON.stringify({ ...payload, timestamp: Date.now() })
           });
         }
 
@@ -192,17 +229,18 @@ document.addEventListener('DOMContentLoaded', () => {
           guestsCustom.style.display = 'none';
           guestsCustom.value = '';
         }
-
       } catch (err) {
-        showAlert("Gửi thành công! Lời chúc đã được ghi nhận.");
+        console.error('[RSVP Error]:', err);
+        showAlert("Không thể lưu lời chúc do lỗi kết nối. Vui lòng thử lại!");
       } finally {
+        isSubmitting = false;
         loadingOverlay?.classList.remove('active');
         if (submitBtn) submitBtn.disabled = false;
       }
     });
   }
 
-  // --- TẮT / MỞ TICKER WIDGET ---
+  // 7. Ticker Widget UI Controls
   const floatingWidget = document.getElementById('floatingWidget');
   const widgetToggleBtn = document.getElementById('widgetToggleBtn');
   const widgetFabIcon = document.getElementById('widgetFabIcon');
@@ -215,41 +253,59 @@ document.addEventListener('DOMContentLoaded', () => {
     floatingWidget?.classList.remove('minimized');
   });
 
-  // ====================================================================
-  // --- ALBUM 3D COVERFLOW & LIGHTBOX GALLERY NÂNG CAO ---
-  // ====================================================================
-  const cards = document.querySelectorAll('.coverflow-card');
+  // 8. Coverflow 3D Album & Lightbox Modal Controller
   const dotsBox = document.getElementById('dotsBox');
   const btnNext = document.getElementById('btnNext');
   const btnPrev = document.getElementById('btnPrev');
   const wrapper = document.getElementById('coverflowWrapper');
 
+  const lbModal = document.getElementById('lightboxModal');
+  const lbZoomImg = document.getElementById('lightboxZoomImg');
+  const lbCounter = document.getElementById('lbCounter');
+  const lbBtnClose = document.getElementById('lightboxClose');
+  const lbBtnPrev = document.getElementById('lbBtnPrev');
+  const lbBtnNext = document.getElementById('lbBtnNext');
+  const lbThumbStrip = document.getElementById('lbThumbStrip');
+  const lbMainStage = document.getElementById('lbMainStage');
+
   let currentCardIndex = 0;
+  let currentGalleryIndex = 0;
   let autoPlayTimer = null;
+  let imageList = [];
+  let cards = [];
 
-  // Danh sách hình ảnh album
-  const imageList = Array.from(cards).map(card => {
-    const img = card.querySelector('img');
-    return img ? img.src : '';
-  }).filter(src => src !== '');
+  function openGalleryAt(index) {
+    if (imageList.length === 0) return;
+    if (index < 0) index = imageList.length - 1;
+    if (index >= imageList.length) index = 0;
+    currentGalleryIndex = index;
 
-  // 1. Tạo thanh chấm Dots điều hướng
-  if (dotsBox && cards.length > 0) {
-    dotsBox.innerHTML = '';
-    cards.forEach((_, idx) => {
-      const dot = document.createElement('div');
-      dot.className = `dot-item ${idx === 0 ? 'active' : ''}`;
-      dot.addEventListener('click', (e) => {
-        e.stopPropagation();
-        goToSlide(idx);
-      });
-      dotsBox.appendChild(dot);
+    if (lbZoomImg) {
+      lbZoomImg.style.opacity = '0.25';
+      lbZoomImg.style.transform = 'scale(0.96)';
+
+      setTimeout(() => {
+        lbZoomImg.src = imageList[currentGalleryIndex];
+        lbZoomImg.style.opacity = '1';
+        lbZoomImg.style.transform = 'scale(1)';
+      }, 100);
+    }
+
+    if (lbCounter) {
+      lbCounter.textContent = `${currentGalleryIndex + 1} / ${imageList.length}`;
+    }
+
+    const thumbs = lbThumbStrip?.querySelectorAll('.lb-thumb-item');
+    thumbs?.forEach((t, i) => {
+      if (i === currentGalleryIndex) {
+        t.classList.add('active');
+        t.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      } else {
+        t.classList.remove('active');
+      }
     });
   }
 
-  const dots = document.querySelectorAll('.dot-item');
-
-  // 2. Cập nhật class Coverflow 3D
   function updateCoverflow(index) {
     const total = cards.length;
     if (total === 0) return;
@@ -278,6 +334,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
+    const dots = dotsBox?.querySelectorAll('.dot-item') || [];
     dots.forEach((dot, idx) => {
       dot.classList.toggle('active', idx === currentCardIndex);
     });
@@ -291,17 +348,6 @@ document.addEventListener('DOMContentLoaded', () => {
   function nextSlide() { goToSlide(currentCardIndex + 1); }
   function prevSlide() { goToSlide(currentCardIndex - 1); }
 
-  btnNext?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    nextSlide();
-  });
-
-  btnPrev?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    prevSlide();
-  });
-
-  // Tự động trượt Coverflow
   function startAutoPlay() {
     if (cards.length > 0) {
       clearInterval(autoPlayTimer);
@@ -314,10 +360,74 @@ document.addEventListener('DOMContentLoaded', () => {
     startAutoPlay();
   }
 
+  function setupAlbumGallery() {
+    cards = Array.from(document.querySelectorAll('.coverflow-card'));
+    if (cards.length === 0) return;
+
+    imageList = cards.map(card => {
+      const img = card.querySelector('img');
+      return img ? img.src : '';
+    }).filter(src => src !== '');
+
+    if (dotsBox) {
+      dotsBox.innerHTML = '';
+      cards.forEach((_, idx) => {
+        const dot = document.createElement('div');
+        dot.className = `dot-item ${idx === 0 ? 'active' : ''}`;
+        dot.addEventListener('click', (e) => {
+          e.stopPropagation();
+          goToSlide(idx);
+        });
+        dotsBox.appendChild(dot);
+      });
+    }
+
+    if (lbThumbStrip && imageList.length > 0) {
+      lbThumbStrip.innerHTML = '';
+      imageList.forEach((src, idx) => {
+        const thumb = document.createElement('div');
+        thumb.className = `lb-thumb-item ${idx === 0 ? 'active' : ''}`;
+        
+        const thumbImg = document.createElement('img');
+        thumbImg.src = src;
+        thumbImg.alt = `Thumbnail ${idx + 1}`;
+        thumb.appendChild(thumbImg);
+
+        thumb.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openGalleryAt(idx);
+        });
+        lbThumbStrip.appendChild(thumb);
+      });
+    }
+
+    cards.forEach((card, idx) => {
+      card.onclick = (e) => {
+        e.stopPropagation();
+        if (idx === currentCardIndex) {
+          openGalleryAt(idx);
+          lbModal?.classList.add('active');
+          document.body.style.overflow = 'hidden';
+        } else {
+          goToSlide(idx);
+        }
+      };
+    });
+
+    updateCoverflow(0);
+    resetAutoPlay();
+  }
+
+  // Expose cho realtime.js gọi lại an toàn
+  window.reinitCoverflow = setupAlbumGallery;
+
+  btnNext?.addEventListener('click', (e) => { e.stopPropagation(); nextSlide(); });
+  btnPrev?.addEventListener('click', (e) => { e.stopPropagation(); prevSlide(); });
+
   wrapper?.addEventListener('mouseenter', () => clearInterval(autoPlayTimer));
   wrapper?.addEventListener('mouseleave', () => startAutoPlay());
 
-  // Vuốt chạm trên Coverflow
+  // Touch Swipe Gesture Handling (Passive Mode)
   let cfTouchStartX = 0;
   let cfTouchStartY = 0;
   let cfIsSwiping = false;
@@ -343,83 +453,7 @@ document.addEventListener('DOMContentLoaded', () => {
     startAutoPlay();
   }, { passive: true });
 
-  // ====================================================================
-  // --- LOGIC LIGHTBOX GALLERY (CHUYỂN ẢNH LIÊN TỤC + THUMBNAILS + SWIPE)
-  // ====================================================================
-  const lbModal = document.getElementById('lightboxModal');
-  const lbZoomImg = document.getElementById('lightboxZoomImg');
-  const lbCounter = document.getElementById('lbCounter');
-  const lbBtnClose = document.getElementById('lightboxClose');
-  const lbBtnPrev = document.getElementById('lbBtnPrev');
-  const lbBtnNext = document.getElementById('lbBtnNext');
-  const lbThumbStrip = document.getElementById('lbThumbStrip');
-  const lbMainStage = document.getElementById('lbMainStage');
-
-  let currentGalleryIndex = 0;
-
-  // Khởi tạo Dải Thumbnail
-  if (lbThumbStrip && imageList.length > 0) {
-    lbThumbStrip.innerHTML = '';
-    imageList.forEach((src, idx) => {
-      const thumb = document.createElement('div');
-      thumb.className = `lb-thumb-item ${idx === 0 ? 'active' : ''}`;
-      thumb.innerHTML = `<img src="${src}" alt="Thumb ${idx + 1}" />`;
-      thumb.addEventListener('click', (e) => {
-        e.stopPropagation();
-        openGalleryAt(idx);
-      });
-      lbThumbStrip.appendChild(thumb);
-    });
-  }
-
-  // Hàm chuyển ảnh trong Lightbox
-  function openGalleryAt(index) {
-    if (index < 0) index = imageList.length - 1;
-    if (index >= imageList.length) index = 0;
-    currentGalleryIndex = index;
-
-    if (lbZoomImg) {
-      lbZoomImg.style.opacity = '0.25';
-      lbZoomImg.style.transform = 'scale(0.96)';
-
-      setTimeout(() => {
-        lbZoomImg.src = imageList[currentGalleryIndex];
-        lbZoomImg.style.opacity = '1';
-        lbZoomImg.style.transform = 'scale(1)';
-      }, 100);
-    }
-
-    if (lbCounter) {
-      lbCounter.textContent = `${currentGalleryIndex + 1} / ${imageList.length}`;
-    }
-
-    // Đánh dấu thumbnail active & cuộn thumbnail vào vùng nhìn
-    const thumbs = lbThumbStrip?.querySelectorAll('.lb-thumb-item');
-    thumbs?.forEach((t, i) => {
-      if (i === currentGalleryIndex) {
-        t.classList.add('active');
-        t.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-      } else {
-        t.classList.remove('active');
-      }
-    });
-  }
-
-  // Click vào card Coverflow: Ở giữa mở Lightbox, ở 2 bên cuộn về giữa
-  cards.forEach((card, idx) => {
-    card.addEventListener('click', (e) => {
-      e.stopPropagation();
-      if (idx === currentCardIndex) {
-        openGalleryAt(idx);
-        lbModal?.classList.add('active');
-        document.body.style.overflow = 'hidden';
-      } else {
-        goToSlide(idx);
-      }
-    });
-  });
-
-  // Điều hướng Lightbox
+  // Lightbox Navigation Controls
   lbBtnPrev?.addEventListener('click', (e) => {
     e.stopPropagation();
     openGalleryAt(currentGalleryIndex - 1);
@@ -442,7 +476,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Phím điều hướng máy tính
   document.addEventListener('keydown', (e) => {
     if (!lbModal?.classList.contains('active')) return;
     if (e.key === 'ArrowLeft') openGalleryAt(currentGalleryIndex - 1);
@@ -450,7 +483,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Escape') closeLightbox();
   });
 
-  // Vuốt chạm chuyển ảnh trên màn hình Lightbox di động
   let lbTouchStartX = 0;
   lbMainStage?.addEventListener('touchstart', (e) => {
     lbTouchStartX = e.changedTouches[0].screenX;
@@ -464,18 +496,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }, { passive: true });
 
-  // --- URL PARAMS GUEST INJECTION ---
+  // 9. URL Guest Parameter Injection (DOM-XSS Safe)
   const params = new URLSearchParams(window.location.search);
   const rawGuest = params.get('invite') || '';
   if (rawGuest) {
     const gateGuest = document.getElementById('gateGuest');
     const nameInput = document.getElementById('nameInput');
     const cleanGuestName = String(rawGuest).trim().slice(0, 60);
+    // Sử dụng textContent và value, triệt tiêu nguy cơ DOM XSS
     if (gateGuest) gateGuest.textContent = cleanGuestName;
     if (nameInput) nameInput.value = cleanGuestName;
   }
 
-  // --- MODAL HỘP QUÀ MỪNG ---
+  // 10. Modal Hộp Quà Mừng
   const giftModal = document.getElementById('giftModal');
   document.getElementById('openGiftModal')?.addEventListener('click', () => giftModal?.classList.add('active'));
   document.getElementById('closeModal')?.addEventListener('click', () => giftModal?.classList.remove('active'));
@@ -483,7 +516,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.target === giftModal) giftModal.classList.remove('active');
   });
 
-  // Khởi chạy
-  updateCoverflow(0);
-  startAutoPlay();
+  // Khởi tạo Album 3D ban đầu
+  setupAlbumGallery();
 });
