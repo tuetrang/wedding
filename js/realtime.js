@@ -180,7 +180,7 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // --- HỆ THỐNG ZOOM TỐI ĐA 10X (PINCH, DOUBLE TAP & DRAG SIÊU MƯỢT) ---
+  // --- HỆ THỐNG ZOOM & PAN CHUẨN XÁC (FIX LỖI THU NHỎ & LỖI NHẢY ẢNH) ---
   const zoomImg = document.getElementById('lightboxZoomImg');
   const lbStage = document.getElementById('lbMainStage');
 
@@ -189,19 +189,20 @@ window.addEventListener('DOMContentLoaded', () => {
     let translateX = 0, translateY = 0;
     let startX = 0, startY = 0;
     let isDragging = false;
-    let lastTapTime = 0;
-
+    let isPinching = false;
     let initialDistance = 0;
     let initialScale = 1;
+    let lastTapTime = 0;
 
     const MIN_SCALE = 1;
     const MAX_SCALE = 10;
-    const DOUBLE_TAP_SCALE = 3.5;
+    const DOUBLE_TAP_SCALE = 3.0;
 
     function applyTransform(animate = false) {
-      zoomImg.style.transition = animate ? 'transform 0.28s cubic-bezier(0.25, 1, 0.5, 1)' : 'none';
+      zoomImg.style.transition = animate ? 'transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1)' : 'none';
       zoomImg.style.transform = `translate3d(${translateX}px, ${translateY}px, 0) scale(${currentScale})`;
-      window.isLightboxZoomed = currentScale > 1.05;
+      // Cờ báo hiệu toàn cục: chỉ cần scale > 1 là coi như đang zoom
+      window.isLightboxZoomed = currentScale > 1.01;
     }
 
     window.resetLightboxZoom = function() {
@@ -213,36 +214,42 @@ window.addEventListener('DOMContentLoaded', () => {
       zoomImg.style.cursor = 'zoom-in';
     };
 
-    // 1. Double Tap: Phóng to 3.5x, chạm đúp lần nữa hồi về 1x
-    zoomImg.addEventListener('touchend', (e) => {
-      const now = Date.now();
-      const tapInterval = now - lastTapTime;
+    // 1. Double tap: nhấp đúp để phóng to 3x / nhấp đúp lần nữa để về 1x
+    lbStage.addEventListener('touchend', (e) => {
+      // Chỉ tính double tap khi chạm 1 ngón và không vừa thực hiện pinch zoom
+      if (e.changedTouches.length === 1 && !isPinching) {
+        const now = Date.now();
+        const tapInterval = now - lastTapTime;
 
-      if (tapInterval < 300 && tapInterval > 0 && e.touches.length === 0) {
-        e.preventDefault();
-        if (currentScale > 1.2) {
-          window.resetLightboxZoom();
-        } else {
-          currentScale = DOUBLE_TAP_SCALE;
-          translateX = 0;
-          translateY = 0;
-          applyTransform(true);
-          zoomImg.style.cursor = 'grab';
+        if (tapInterval < 300 && tapInterval > 0) {
+          e.preventDefault();
+          if (currentScale > 1.1) {
+            window.resetLightboxZoom();
+          } else {
+            currentScale = DOUBLE_TAP_SCALE;
+            translateX = 0;
+            translateY = 0;
+            applyTransform(true);
+          }
         }
+        lastTapTime = now;
       }
-      lastTapTime = now;
     });
 
-    // 2. Chạm ngón tay vào màn hình (TouchStart)
+    // 2. Chạm vào màn hình (Bắt trên toàn bộ lbStage: cả mép lẫn trên mặt ảnh)
     lbStage.addEventListener('touchstart', (e) => {
       if (e.touches.length === 2) {
+        // Cử chỉ 2 ngón: BẬT PINCH ZOOM, khóa ngay lập tức cờ vuốt chuyển ảnh
+        isPinching = true;
         isDragging = false;
+        window.isLightboxZoomed = true;
         initialDistance = Math.hypot(
           e.touches[0].clientX - e.touches[1].clientX,
           e.touches[0].clientY - e.touches[1].clientY
         );
         initialScale = currentScale;
-      } else if (e.touches.length === 1 && currentScale > 1.05) {
+      } else if (e.touches.length === 1 && currentScale > 1.01) {
+        // 1 ngón chạm khi ảnh đang zoom: Kéo rê (Pan)
         isDragging = true;
         startX = e.touches[0].clientX - translateX;
         startY = e.touches[0].clientY - translateY;
@@ -251,18 +258,19 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // 3. Di chuyển ngón tay (TouchMove)
     lbStage.addEventListener('touchmove', (e) => {
-      if (e.touches.length === 2) {
-        e.preventDefault();
+      if (e.touches.length === 2 && isPinching) {
+        e.preventDefault(); // Ngăn cuộn trang
         const currentDistance = Math.hypot(
           e.touches[0].clientX - e.touches[1].clientX,
           e.touches[0].clientY - e.touches[1].clientY
         );
         if (initialDistance > 0) {
           const factor = currentDistance / initialDistance;
+          // Zoom tự do từ 1x đến 10x
           currentScale = Math.min(Math.max(MIN_SCALE, initialScale * factor), MAX_SCALE);
           applyTransform(false);
         }
-      } else if (e.touches.length === 1 && isDragging && currentScale > 1.05) {
+      } else if (e.touches.length === 1 && isDragging && currentScale > 1.01) {
         e.preventDefault();
         translateX = e.touches[0].clientX - startX;
         translateY = e.touches[0].clientY - startY;
@@ -270,28 +278,34 @@ window.addEventListener('DOMContentLoaded', () => {
       }
     }, { passive: false });
 
-    // 4. Nhấc tay ra (TouchEnd)
+    // 4. Nhấc ngón tay ra (TouchEnd)
     lbStage.addEventListener('touchend', (e) => {
-      if (e.touches.length < 2) initialDistance = 0;
       if (e.touches.length === 0) {
         isDragging = false;
-        if (currentScale < 1.05) {
+        // Trì hoãn tắt cờ isPinching một chút để chặn touchend của app.js
+        setTimeout(() => {
+          isPinching = false;
+        }, 150);
+
+        // KHÔNG TỰ ĐỘNG THU NHỎ LẠI: giữ nguyên bất kỳ vị trí scale nào bạn vừa kéo tới
+        // Chỉ reset khi bạn chủ động bóp nhỏ dưới 0.95x
+        if (currentScale < 0.95) {
           window.resetLightboxZoom();
+        } else {
+          applyTransform(false);
         }
+      } else if (e.touches.length === 1) {
+        // Khi nhấc 1 ngón ra trước, chuyển sang chế độ kéo rê mượt mà
+        startX = e.touches[0].clientX - translateX;
+        startY = e.touches[0].clientY - translateY;
       }
     });
 
-    // 5. Chuột máy tính: Wheel zoom tới 10x, click zoom 3.5x
+    // 5. Chuột PC (Wheel & Click)
     zoomImg.addEventListener('wheel', (e) => {
       e.preventDefault();
       const zoomStep = e.deltaY < 0 ? 0.35 : -0.35;
       currentScale = Math.min(Math.max(MIN_SCALE, currentScale + zoomStep), MAX_SCALE);
-      if (currentScale <= 1.05) {
-        translateX = 0; translateY = 0;
-        zoomImg.style.cursor = 'zoom-in';
-      } else {
-        zoomImg.style.cursor = 'grab';
-      }
       applyTransform(false);
     }, { passive: false });
 
