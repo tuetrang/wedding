@@ -105,7 +105,7 @@ function scheduleUIRefresh() {
   }, 50);
 }
 
-// 1. Lắng nghe Firebase Realtime danh sách lời chúc
+// 1. Lắng nghe Firebase Realtime danh sách lời chúc (RSVP)
 if (typeof wishesRef !== 'undefined' && wishesRef) {
   wishesRef.limitToLast(MAX_WISHES_LIMIT).on('child_added', (snapshot) => {
     const item = snapshot.val();
@@ -128,7 +128,7 @@ if (typeof wishesRef !== 'undefined' && wishesRef) {
       scheduleUIRefresh();
     }
   }, (err) => {
-    console.warn('[Realtime] Lỗi nạp dữ liệu:', err.message);
+    console.warn('[Realtime] Lỗi nạp dữ liệu lời chúc:', err.message);
   });
 
   wishesRef.on('child_removed', (snapshot) => {
@@ -138,7 +138,7 @@ if (typeof wishesRef !== 'undefined' && wishesRef) {
   });
 }
 
-// 2. Lắng nghe Realtime Album ảnh và Tích hợp Zoom & Pan Chuẩn Xác bằng Pointer Events
+// 2. Lắng nghe Realtime Album ảnh và Tích hợp Zoom & Pan 10x
 window.addEventListener('DOMContentLoaded', () => {
   if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length > 0) {
     const albumRef = firebase.database().ref('album_photos');
@@ -180,94 +180,131 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // --- HỆ THỐNG ZOOM & PAN DÙNG POINTER EVENTS (FIX TRIỆT ĐỂ MỌI LỖI KÉO THẢ) ---
+  // --- HỆ THỐNG ZOOM TỐI ĐA 10X (PINCH, DOUBLE TAP & DRAG SIÊU MƯỢT) ---
   const zoomImg = document.getElementById('lightboxZoomImg');
-  if (zoomImg) {
+  const lbStage = document.getElementById('lbMainStage');
+
+  if (zoomImg && lbStage) {
     let currentScale = 1;
-    let isPointerDragging = false;
-    let startX = 0, startY = 0;
     let translateX = 0, translateY = 0;
-    let savedTranslateX = 0, savedTranslateY = 0;
-    let pointerStartTime = 0;
+    let startX = 0, startY = 0;
+    let isDragging = false;
+    let lastTapTime = 0;
+
+    let initialDistance = 0;
+    let initialScale = 1;
+
+    const MIN_SCALE = 1;
+    const MAX_SCALE = 10;
+    const DOUBLE_TAP_SCALE = 3.5;
+
+    function applyTransform(animate = false) {
+      zoomImg.style.transition = animate ? 'transform 0.28s cubic-bezier(0.25, 1, 0.5, 1)' : 'none';
+      zoomImg.style.transform = `translate3d(${translateX}px, ${translateY}px, 0) scale(${currentScale})`;
+      window.isLightboxZoomed = currentScale > 1.05;
+    }
 
     window.resetLightboxZoom = function() {
       currentScale = 1;
-      translateX = 0; translateY = 0;
-      savedTranslateX = 0; savedTranslateY = 0;
-      zoomImg.style.transform = `translate(0px, 0px) scale(1)`;
+      translateX = 0;
+      translateY = 0;
+      window.isLightboxZoomed = false;
+      applyTransform(true);
       zoomImg.style.cursor = 'zoom-in';
     };
 
-    zoomImg.addEventListener('dragstart', (e) => e.preventDefault());
+    // 1. Double Tap: Phóng to 3.5x, chạm đúp lần nữa hồi về 1x
+    zoomImg.addEventListener('touchend', (e) => {
+      const now = Date.now();
+      const tapInterval = now - lastTapTime;
 
-    // Click / Tap để phóng to hoặc thu nhỏ
-    zoomImg.addEventListener('click', (e) => {
-      e.stopPropagation();
-      // Nếu thời gian giữ pointer nhỏ hơn 250ms thì tính là click bình thường
-      if (Date.now() - pointerStartTime < 250 && Math.abs(translateX - savedTranslateX) < 5) {
-        if (currentScale === 1) {
-          currentScale = 2.5;
-          zoomImg.style.cursor = 'grab';
+      if (tapInterval < 300 && tapInterval > 0 && e.touches.length === 0) {
+        e.preventDefault();
+        if (currentScale > 1.2) {
+          window.resetLightboxZoom();
         } else {
-          currentScale = 1;
-          translateX = 0; translateY = 0;
-          savedTranslateX = 0; savedTranslateY = 0;
-          zoomImg.style.cursor = 'zoom-in';
+          currentScale = DOUBLE_TAP_SCALE;
+          translateX = 0;
+          translateY = 0;
+          applyTransform(true);
+          zoomImg.style.cursor = 'grab';
         }
-        zoomImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${currentScale})`;
       }
+      lastTapTime = now;
     });
 
-    // Cuộn chuột zoom trên PC (Ctrl + Wheel)
-    zoomImg.addEventListener('wheel', (e) => {
-      e.preventDefault();
-      if (e.ctrlKey) {
-        let zoomFactor = e.deltaY < 0 ? 0.25 : -0.25;
-        currentScale = Math.min(Math.max(1, currentScale + zoomFactor), 4);
-        if (currentScale === 1) {
-          translateX = 0; translateY = 0;
-          savedTranslateX = 0; savedTranslateY = 0;
-          zoomImg.style.cursor = 'zoom-in';
-        } else {
-          zoomImg.style.cursor = 'grab';
-        }
-        zoomImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${currentScale})`;
+    // 2. Chạm ngón tay vào màn hình (TouchStart)
+    lbStage.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 2) {
+        isDragging = false;
+        initialDistance = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+        initialScale = currentScale;
+      } else if (e.touches.length === 1 && currentScale > 1.05) {
+        isDragging = true;
+        startX = e.touches[0].clientX - translateX;
+        startY = e.touches[0].clientY - translateY;
       }
     }, { passive: false });
 
-    // --- POINTER DOWN (Bắt đầu kéo chuột/cảm ứng) ---
-    zoomImg.addEventListener('pointerdown', (e) => {
-      if (currentScale > 1) {
-        isPointerDragging = true;
-        pointerStartTime = Date.now();
-        zoomImg.style.cursor = 'grabbing';
-        startX = e.clientX - savedTranslateX;
-        startY = e.clientY - savedTranslateY;
-        zoomImg.setPointerCapture(e.pointerId);
+    // 3. Di chuyển ngón tay (TouchMove)
+    lbStage.addEventListener('touchmove', (e) => {
+      if (e.touches.length === 2) {
         e.preventDefault();
+        const currentDistance = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+        if (initialDistance > 0) {
+          const factor = currentDistance / initialDistance;
+          currentScale = Math.min(Math.max(MIN_SCALE, initialScale * factor), MAX_SCALE);
+          applyTransform(false);
+        }
+      } else if (e.touches.length === 1 && isDragging && currentScale > 1.05) {
+        e.preventDefault();
+        translateX = e.touches[0].clientX - startX;
+        translateY = e.touches[0].clientY - startY;
+        applyTransform(false);
+      }
+    }, { passive: false });
+
+    // 4. Nhấc tay ra (TouchEnd)
+    lbStage.addEventListener('touchend', (e) => {
+      if (e.touches.length < 2) initialDistance = 0;
+      if (e.touches.length === 0) {
+        isDragging = false;
+        if (currentScale < 1.05) {
+          window.resetLightboxZoom();
+        }
       }
     });
 
-    // --- POINTER MOVE (Đang di chuyển kéo thả) ---
-    zoomImg.addEventListener('pointermove', (e) => {
-      if (!isPointerDragging || currentScale <= 1) return;
-      translateX = e.clientX - startX;
-      translateY = e.clientY - startY;
-      zoomImg.style.transform = `translate(${translateX}px, ${translateY}px) scale(${currentScale})`;
-    });
-
-    // --- POINTER UP / CANCEL (Kết thúc kéo) ---
-    const endPointerDrag = (e) => {
-      if (isPointerDragging) {
-        isPointerDragging = false;
-        savedTranslateX = translateX;
-        savedTranslateY = translateY;
-        if (currentScale > 1) zoomImg.style.cursor = 'grab';
-        try { zoomImg.releasePointerCapture(e.pointerId); } catch (_) {}
+    // 5. Chuột máy tính: Wheel zoom tới 10x, click zoom 3.5x
+    zoomImg.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const zoomStep = e.deltaY < 0 ? 0.35 : -0.35;
+      currentScale = Math.min(Math.max(MIN_SCALE, currentScale + zoomStep), MAX_SCALE);
+      if (currentScale <= 1.05) {
+        translateX = 0; translateY = 0;
+        zoomImg.style.cursor = 'zoom-in';
+      } else {
+        zoomImg.style.cursor = 'grab';
       }
-    };
+      applyTransform(false);
+    }, { passive: false });
 
-    zoomImg.addEventListener('pointerup', endPointerDrag);
-    zoomImg.addEventListener('pointercancel', endPointerDrag);
+    zoomImg.addEventListener('click', (e) => {
+      if (window.matchMedia('(pointer:fine)').matches) {
+        if (currentScale > 1.2) {
+          window.resetLightboxZoom();
+        } else {
+          currentScale = DOUBLE_TAP_SCALE;
+          translateX = 0; translateY = 0;
+          applyTransform(true);
+        }
+      }
+    });
   }
 });

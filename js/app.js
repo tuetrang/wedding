@@ -170,6 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
       loadingOverlay?.classList.add('active');
       if (submitBtn) submitBtn.disabled = true;
 
+      // Format chuẩn xác: HH:mm:ss DD/MM/YYYY (ví dụ: 18:49:06 15/10/2026)
       const now = new Date();
       const hours = String(now.getHours()).padStart(2, '0');
       const minutes = String(now.getMinutes()).padStart(2, '0');
@@ -275,6 +276,10 @@ document.addEventListener('DOMContentLoaded', () => {
   let cards = [];
 
   function openGalleryAt(index) {
+    if (typeof window.resetLightboxZoom === 'function') {
+      window.resetLightboxZoom();
+    }
+
     if (imageList.length === 0) return;
     if (index < 0) index = imageList.length - 1;
     if (index >= imageList.length) index = 0;
@@ -427,7 +432,7 @@ document.addEventListener('DOMContentLoaded', () => {
   wrapper?.addEventListener('mouseenter', () => clearInterval(autoPlayTimer));
   wrapper?.addEventListener('mouseleave', () => startAutoPlay());
 
-  // Touch Swipe Gesture Handling (Passive Mode)
+  // Touch Swipe Gesture Handling (CoverFlow)
   let cfTouchStartX = 0;
   let cfTouchStartY = 0;
   let cfIsSwiping = false;
@@ -465,6 +470,9 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   function closeLightbox() {
+    if (typeof window.resetLightboxZoom === 'function') {
+      window.resetLightboxZoom();
+    }
     lbModal?.classList.remove('active');
     document.body.style.overflow = '';
   }
@@ -483,14 +491,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Escape') closeLightbox();
   });
 
+  // Vuốt chuyển ảnh trong Lightbox: Chỉ cho phép chuyển khi ảnh KHÔNG phóng to
   let lbTouchStartX = 0;
   lbMainStage?.addEventListener('touchstart', (e) => {
     lbTouchStartX = e.changedTouches[0].screenX;
   }, { passive: true });
 
   lbMainStage?.addEventListener('touchend', (e) => {
+    if (window.isLightboxZoomed) return;
+
     const diff = lbTouchStartX - e.changedTouches[0].screenX;
-    if (Math.abs(diff) > 40) {
+    if (Math.abs(diff) > 50) {
       if (diff > 0) openGalleryAt(currentGalleryIndex + 1);
       else openGalleryAt(currentGalleryIndex - 1);
     }
@@ -503,7 +514,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const gateGuest = document.getElementById('gateGuest');
     const nameInput = document.getElementById('nameInput');
     const cleanGuestName = String(rawGuest).trim().slice(0, 60);
-    // Sử dụng textContent và value, triệt tiêu nguy cơ DOM XSS
     if (gateGuest) gateGuest.textContent = cleanGuestName;
     if (nameInput) nameInput.value = cleanGuestName;
   }
