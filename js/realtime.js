@@ -46,7 +46,7 @@ function startTickerLoop() {
 }
 
 // =========================================================
-// 2. KHUNG LỜI CHÚC: CUỘN VÔ HẠN 2 CHIỀU (LÊN / XUỐNG ĐỀU VÔ HẠN)
+// 2. KHUNG LỜI CHÚC: AUTO-SCROLL & CUỘN TAY MƯỢT TRÊN IPHONE
 // =========================================================
 function renderCardHTML(w) {
   return `
@@ -70,32 +70,34 @@ function setupSeamlessInfiniteScroller(scrollWrapper) {
     marqueeRafId = null;
   }
 
-  const scrollSpeed = 0.65; // Tốc độ tự trôi nhẹ nhàng
+  const scrollSpeed = 0.65; // Tốc độ trôi êm mắt
 
-  // 1 block chiếm đúng 1/3 tổng chiều dài scrollHeight (vì có 3 khối bản sao)
   function getSingleBlockHeight() {
     return scrollWrapper.scrollHeight / 3;
   }
 
-  // Khởi tạo vị trí đứng ngay đầu khối ở giữa (block 2)
-  requestAnimationFrame(() => {
+  // Khởi tạo vị trí đứng an toàn ở giữa sau khi iOS đã render đủ DOM
+  setTimeout(() => {
     const single = getSingleBlockHeight();
-    if (single > 0 && scrollWrapper.scrollTop < 10) {
+    if (single > 0 && scrollWrapper.scrollTop < 20) {
       scrollWrapper.scrollTop = single;
     }
-  });
+  }, 100);
 
-  // Cơ chế tái định vị vô hạn 2 chiều
+  // Cơ chế tái định vị vô hạn 2 chiều tối ưu hóa cho iOS Safari
   function checkBoundaryLoop() {
     const single = getSingleBlockHeight();
     if (single <= 0) return;
 
-    // Khi cuộn xuống sâu chạm vào khối 3 -> kéo ngược về khối 2
-    if (scrollWrapper.scrollTop >= single * 2) {
+    // Ngưỡng đệm (Buffer): Tránh đụng phải giới hạn nảy dây thun (rubber-band) của iOS
+    const buffer = 40;
+
+    // Khi cuộn xuống sâu chạm khối 3 -> quay về khối 2
+    if (scrollWrapper.scrollTop >= single * 2 - buffer) {
       scrollWrapper.scrollTop -= single;
     } 
-    // Khi cuộn ngược lên trên đụng vào khối 1 -> đẩy xuống khối 2
-    else if (scrollWrapper.scrollTop <= 10) {
+    // Khi cuộn ngược lên trên đụng gần đỉnh khối 1 -> đẩy xuống khối 2
+    else if (scrollWrapper.scrollTop <= buffer) {
       scrollWrapper.scrollTop += single;
     }
   }
@@ -108,6 +110,7 @@ function setupSeamlessInfiniteScroller(scrollWrapper) {
     marqueeRafId = requestAnimationFrame(stepMarquee);
   }
 
+  // Kích hoạt animation loop
   marqueeRafId = requestAnimationFrame(stepMarquee);
 
   function pause() {
@@ -126,17 +129,28 @@ function setupSeamlessInfiniteScroller(scrollWrapper) {
   if (!scrollWrapper.dataset.infiniteBound) {
     scrollWrapper.dataset.infiniteBound = '1';
 
-    // Bắt sự kiện cuộn liên tục để luôn đảm bảo không bao giờ kịch đáy/đỉnh
+    // Bắt sự kiện cuộn liên tục (xử lý cả quán tính cuộn của iOS)
     scrollWrapper.addEventListener('scroll', () => {
       checkBoundaryLoop();
+      if (isMarqueePaused) {
+        resume(1500); // Tự động hồi phục chạy tiếp sau khi trượt quán tính dừng hẳn
+      }
     }, { passive: true });
 
-    // Thao tác vuốt ngón tay (Mobile touch)
-    scrollWrapper.addEventListener('touchstart', pause, { passive: true });
-    scrollWrapper.addEventListener('touchend', () => resume(1200), { passive: true });
-    scrollWrapper.addEventListener('touchcancel', () => resume(1200), { passive: true });
+    // Touch trên iPhone
+    scrollWrapper.addEventListener('touchstart', () => {
+      pause();
+    }, { passive: true });
 
-    // Thao tác lăn chuột (Desktop wheel)
+    scrollWrapper.addEventListener('touchend', () => {
+      resume(1200);
+    }, { passive: true });
+
+    scrollWrapper.addEventListener('touchcancel', () => {
+      resume(1200);
+    }, { passive: true });
+
+    // Lăn chuột trên máy tính
     scrollWrapper.addEventListener('wheel', () => {
       pause();
       resume(1200);
@@ -170,9 +184,9 @@ function refreshWishesDOM() {
 
   const cardsHtml = wishesQueue.map(renderCardHTML).join('');
 
-  // Nhân bản thành 3 khối (A + A + A) để triệt tiêu hoàn toàn điểm chết kịch đáy
+  // Cấu hình CSS inline: khóa nảy dây thun iOS (overscroll-behavior-y: contain) và bật touch mượt
   container.innerHTML = `
-    <div class="marquee-wishes-wrapper" style="overflow-y: auto !important; height: 100%; position: relative; scrollbar-width: none; -ms-overflow-style: none; -webkit-overflow-scrolling: touch;">
+    <div class="marquee-wishes-wrapper" style="overflow-y: auto !important; height: 100%; position: relative; scrollbar-width: none; -ms-overflow-style: none; -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain;">
       <div class="marquee-track" style="animation: none !important;">
         ${cardsHtml}
       </div>
