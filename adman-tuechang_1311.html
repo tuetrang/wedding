@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
     script-src 'self' 'unsafe-inline' 'unsafe-eval' 
@@ -53,6 +53,7 @@
       padding: 30px 15px;
       line-height: 1.6;
       min-height: 100vh;
+      min-height: 100dvh;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -299,7 +300,6 @@
     }
   }
 
-  // Hàm tự động bóc tách ID sau /d/ từ link Google Drive
   function convertGoogleDriveLink(url) {
     if (!url || typeof url !== 'string') return url;
     let cleanUrl = url.trim();
@@ -318,7 +318,11 @@
     const auth = firebase.auth();
     const db = firebase.database();
     const albumRef = db.ref('album_photos');
-    const probeRef = db.ref('admin_probe'); // Trở lại node admin_probe chính hãng theo Rules của mày
+    const probeRef = db.ref('admin_probe');
+
+    // CẤU HÌNH PERSISTENCE NONE NGAY TỪ ĐẦU (Chỉ lưu session trên RAM, không lưu ổ cứng)
+    auth.setPersistence(firebase.auth.Auth.Persistence.NONE)
+      .catch((err) => console.warn('[Persistence Init Warning]:', err));
 
     const loginSection = document.getElementById('loginSection');
     const dashboardSection = document.getElementById('dashboardSection');
@@ -349,7 +353,7 @@
       });
     }
 
-    // Xác thực quyền hạn chuẩn xác qua admin_probe
+    // Lắng nghe trạng thái đăng nhập
     auth.onAuthStateChanged((user) => {
       if (user) {
         loginStatus.className = 'status-msg';
@@ -379,17 +383,14 @@
       showFatalError();
     });
 
-    // Ép buộc Token chỉ lưu trên RAM (Persistence NONE)
+    // BẬT POPUP NGAY LẬP TỨC: Không để lệnh nằm sau Promise nào để Safari không chặn
     btnGoogleLogin.addEventListener('click', () => {
       loginStatus.className = 'status-msg';
-      loginStatus.textContent = 'Đang thiết lập phiên làm việc...';
+      loginStatus.textContent = 'Đang mở cửa sổ đăng nhập Google...';
 
-      auth.setPersistence(firebase.auth.Auth.Persistence.NONE)
-        .then(() => {
-          loginStatus.textContent = 'Đang kết nối xác thực Google...';
-          const provider = new firebase.auth.GoogleAuthProvider();
-          return auth.signInWithPopup(provider);
-        })
+      const provider = new firebase.auth.GoogleAuthProvider();
+
+      auth.signInWithPopup(provider)
         .then(() => {
           loginStatus.textContent = '';
         })
@@ -398,9 +399,11 @@
           if (err && err.code === 'auth/unauthorized-domain') {
             loginStatus.textContent = 'Domain hiện tại chưa được cấp phép trên Firebase.';
           } else if (err && err.code === 'auth/popup-blocked') {
-            loginStatus.textContent = 'Trình duyệt đang chặn Popup đăng nhập.';
+            loginStatus.textContent = 'Trình duyệt đang chặn Popup đăng nhập. Hãy tắt chặn popup trong Cài đặt Safari.';
+          } else if (err && err.code === 'auth/popup-closed-by-user') {
+            loginStatus.textContent = 'Đã hủy đăng nhập.';
           } else {
-            loginStatus.textContent = 'Xác thực không thành công. Vui lòng thử lại!';
+            loginStatus.textContent = 'Xác thực không thành công: ' + (err.message || 'Thử lại sau.');
           }
         });
     });

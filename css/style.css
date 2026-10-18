@@ -536,13 +536,14 @@ body {
 }
 
 /* =========================================================
-   LIGHTBOX GALLERY NÂNG CAO (ĐÃ FIX CHUẨN ZOOM & PAN TRÊN ĐT)
+   LIGHTBOX GALLERY NÂNG CAO (FIXED SAFARI DYNAMIC BOTTOM BAR)
    ========================================================= */
 .lightbox-modal {
   position: fixed !important;
   inset: 0 !important;
   width: 100vw !important;
   height: 100vh !important;
+  height: 100dvh !important; /* Dynamic viewport: Tự co giãn theo thanh Safari */
   background: rgba(10, 15, 12, 0.96) !important;
   backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
@@ -551,7 +552,8 @@ body {
   flex-direction: column !important;
   justify-content: space-between !important;
   align-items: center !important;
-  padding: 15px 0 20px 0 !important;
+  padding-top: max(12px, env(safe-area-inset-top)) !important;
+  padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -571,7 +573,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 5px 20px;
+  padding: 4px 20px;
   flex-shrink: 0;
   z-index: 10;
 }
@@ -602,11 +604,12 @@ body {
   position: relative;
   width: 100%;
   flex-grow: 1;
+  min-height: 0; /* Cho phép flex item co lại, không đẩy thumbnail tràn đáy */
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  touch-action: none !important; /* Mở khóa toàn bộ cử chỉ cảm ứng cho JS xử lý zoom/pan */
+  touch-action: none !important;
 }
 
 .lb-image-container {
@@ -616,20 +619,20 @@ body {
   width: 100%;
   height: 100%;
   padding: 5px 15px;
-  overflow: auto; /* Cho phép cuộn trượt vùng nhìn khi ảnh phóng to */
-  -webkit-overflow-scrolling: touch;
+  overflow: visible;
 }
 
 .lb-image-container img {
   max-width: 92%;
-  max-height: 85vh;
+  max-height: 72vh;
   object-fit: contain;
   border-radius: 16px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
-  transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
   cursor: zoom-in;
   transform-origin: center center;
   touch-action: none !important;
+  will-change: transform;
+  image-rendering: -webkit-optimize-contrast;
 }
 
 .lb-nav-btn {
@@ -662,12 +665,14 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 12px 18px 5px;
+  padding: 8px 18px 4px;
   overflow-x: auto;
   overflow-y: hidden;
   flex-shrink: 0;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  position: relative;
+  z-index: 20;
 }
 .lb-thumbnails-strip::-webkit-scrollbar {
   display: none;
@@ -698,7 +703,7 @@ body {
 }
 
 /* =========================================================
-   PHẦN TIỆC CƯỚI: ĐỒNG BỘ 100% CỠ CHỮ & ĐỘ ĐẬM THEO ẢNH MAIN 2
+   PHẦN TIỆC CƯỚI: ĐỒNG BỘ CỠ CHỮ & ĐỘ ĐẬM THEO POSTER
    ========================================================= */
 .reception-header-title {
   font-family: var(--font-lora) !important;
@@ -840,36 +845,6 @@ body {
   font-weight: 700 !important;
   color: #3f5945 !important;
   margin-top: 4px;
-}
-
-.reception-honor-invite {
-  margin: 25px auto 10px;
-  max-width: 480px;
-  padding: 16px 20px;
-  background: rgba(255, 253, 250, 0.65);
-  border-radius: 12px;
-  border: 1px dashed rgba(38, 59, 43, 0.45);
-}
-
-.reception-honor-invite .honor-text {
-  font-family: var(--font-lora);
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: #263b2b;
-  line-height: 1.45;
-  margin-bottom: 6px;
-}
-
-.reception-honor-invite .honor-subtext {
-  font-family: var(--font-lora);
-  font-size: 0.85rem;
-  color: #3f5945;
-  line-height: 1.5;
-}
-
-.reception-honor-invite .honor-subtext strong {
-  color: #263b2b;
-  font-weight: 700;
 }
 
 .btn-add-calendar-link {
@@ -1308,7 +1283,7 @@ body {
   50% { opacity: 0.45; }
 }
 
-/* FOOTER ĐỒNG BỘ NỀN VỚI SECTION 4 (KHÔNG GẠCH CHẤM) */
+/* FOOTER ĐỒNG BỘ NỀN VỚI SECTION 4 */
 .wedding-footer {
   padding: 35px 15px 20px;
   text-align: center;
@@ -1476,7 +1451,7 @@ body {
 }
 
 /* =========================================================
-   RESPONSIVE CHO MOBILE (NÂNG SIZE CARD COVERFLOW TO RÕ)
+   RESPONSIVE CHO MOBILE
    ========================================================= */
 @media (max-width: 768px) {
   .album-section,
@@ -1501,7 +1476,7 @@ body {
     margin-bottom: 22px !important;
   }
 
-  /* KÍCH THƯỚC CARD ẢNH CƯỚI TO RÕ TRÊN MOBILE */
+  /* Kích thước Coverflow Card Mobile */
   .coverflow-wrapper {
     height: 350px !important;
     -webkit-perspective: 700px !important;
@@ -1555,9 +1530,24 @@ body {
   .btn-prev { left: 4px !important; width: 34px !important; height: 34px !important; }
   .btn-next { right: 4px !important; width: 34px !important; height: 34px !important; }
 
-  /* LIGHTBOX RESPONSIVE MOBILE */
-  .lightbox-modal { padding: 10px 0 16px 0 !important; }
-  .lb-image-container img { max-width: 95%; border-radius: 14px; }
+  /* LIGHTBOX RESPONSIVE MOBILE - TRÁNH THANH ĐIỀU HƯỚNG SAFARI TRÊN IPHONE */
+  .lightbox-modal { 
+    padding-top: max(10px, env(safe-area-inset-top)) !important;
+    padding-bottom: max(22px, env(safe-area-inset-bottom)) !important; 
+  }
+  .lb-image-container img { 
+    max-width: 95%; 
+    max-height: 64vh !important; /* Giảm nhẹ chiều cao ảnh chính để nhường không gian cho thumbnail */
+    border-radius: 14px; 
+  }
+  .lb-thumbnails-strip {
+    padding: 6px 14px max(14px, env(safe-area-inset-bottom)) !important;
+    gap: 8px !important;
+  }
+  .lb-thumb-item { 
+    width: 48px !important; 
+    height: 60px !important; /* Kích thước thumbnail cân đối, thấy trọn vẹn 100% */
+  }
   .lb-nav-btn {
     width: 36px;
     height: 36px;
@@ -1566,7 +1556,6 @@ body {
   }
   .lb-btn-prev { left: 8px; }
   .lb-btn-next { right: 8px; }
-  .lb-thumb-item { width: 50px; height: 62px; }
 
   /* SECTION TIỆC CƯỚI */
   .reception-details-section { padding: 45px 15px 40px 15px !important; }
