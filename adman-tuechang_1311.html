@@ -154,9 +154,10 @@
       flex-direction: column;
       gap: 12px;
       margin-bottom: 20px;
-      max-height: 480px;
+      max-height: 520px;
       overflow-y: auto;
       padding-right: 6px;
+      position: relative;
     }
     .img-item-row {
       display: flex;
@@ -166,7 +167,38 @@
       border: 1px solid var(--border);
       padding: 10px 14px;
       border-radius: 12px;
+      transition: transform 0.15s ease, background 0.15s ease, opacity 0.15s ease;
+      user-select: none;
     }
+    
+    /* GIAO DIỆN TAY CẦM KÉO THẢ */
+    .drag-handle {
+      cursor: grab;
+      color: var(--text-muted);
+      font-size: 1.4rem;
+      padding: 4px 6px;
+      touch-action: none; /* Khóa cuộn trang khi kéo trên mobile */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s;
+    }
+    .drag-handle:active {
+      cursor: grabbing;
+      color: var(--accent);
+    }
+
+    /* TRẠNG THÁI KHI ĐANG KÉO */
+    .img-item-row.is-dragging {
+      opacity: 0.45;
+      border: 1.5px dashed var(--accent);
+      background: rgba(92, 141, 103, 0.15);
+    }
+    .img-item-row.drag-over {
+      border-top: 2.5px solid var(--accent);
+      transform: translateY(-2px);
+    }
+
     .row-index {
       font-weight: 700;
       color: var(--accent);
@@ -193,6 +225,7 @@
       color: #fff;
       font-size: 0.9rem;
       outline: none;
+      user-select: text; /* Cho phép nhập liệu bình thường */
     }
     .form-control:focus { border-color: var(--accent); }
     .btn-delete-row {
@@ -208,6 +241,7 @@
       align-items: center;
       justify-content: center;
       transition: all 0.2s;
+      flex-shrink: 0;
     }
     .btn-delete-row:hover { background: var(--danger); color: #fff; }
     .btn-action {
@@ -273,7 +307,7 @@
       </div>
 
       <h2>QUẢN LÝ ALBUM ẢNH CƯỚI</h2>
-      <p class="sub-title">Dán link Google Drive hoặc URL ảnh trực tiếp vào ô bên dưới</p>
+      <p class="sub-title">Kéo giữ biểu tượng ⠿ để đổi vị trí ảnh • Dán link Google Drive hoặc URL ảnh</p>
 
       <div class="img-list-group" id="imgListGroup"></div>
 
@@ -320,7 +354,7 @@
     const albumRef = db.ref('album_photos');
     const probeRef = db.ref('admin_probe');
 
-    // CẤU HÌNH PERSISTENCE NONE NGAY TỪ ĐẦU (Chỉ lưu session trên RAM, không lưu ổ cứng)
+    // CẤU HÌNH PERSISTENCE NONE (Chỉ lưu session trên RAM)
     auth.setPersistence(firebase.auth.Auth.Persistence.NONE)
       .catch((err) => console.warn('[Persistence Init Warning]:', err));
 
@@ -350,6 +384,83 @@
       rows.forEach((row, i) => {
         const idxEl = row.querySelector('.row-index');
         if (idxEl) idxEl.textContent = '#' + (i + 1);
+      });
+    }
+
+    // =========================================================
+    // XỬ LÝ KÉO THẢ ĐỔI VỊ TRÍ ẢNH (PC & MOBILE)
+    // =========================================================
+    let draggedRow = null;
+
+    function attachDragAndDropHandlers(row) {
+      const handle = row.querySelector('.drag-handle');
+
+      // --- 1. DÀNH CHO PC (HTML5 Drag and Drop) ---
+      row.addEventListener('dragstart', (e) => {
+        draggedRow = row;
+        row.classList.add('is-dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', '');
+      });
+
+      row.addEventListener('dragend', () => {
+        row.classList.remove('is-dragging');
+        document.querySelectorAll('.img-item-row').forEach(r => r.classList.remove('drag-over'));
+        draggedRow = null;
+        reindexRows();
+      });
+
+      row.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        if (draggedRow && draggedRow !== row) {
+          const rect = row.getBoundingClientRect();
+          const next = (e.clientY - rect.top) / (rect.bottom - rect.top) > 0.5;
+          imgListGroup.insertBefore(draggedRow, next ? row.nextSibling : row);
+        }
+      });
+
+      // --- 2. DÀNH CHO MOBILE (Touch Drag) ---
+      let touchStartY = 0;
+      let activeTouchRow = null;
+
+      handle.addEventListener('touchstart', (e) => {
+        if (e.touches.length !== 1) return;
+        activeTouchRow = row;
+        touchStartY = e.touches[0].clientY;
+        activeTouchRow.classList.add('is-dragging');
+      }, { passive: true });
+
+      handle.addEventListener('touchmove', (e) => {
+        if (!activeTouchRow || e.touches.length !== 1) return;
+        e.preventDefault(); // Ngăn cuộn trang ngoài khi đang kéo dòng ảnh
+
+        const currentY = e.touches[0].clientY;
+        // Tìm element dưới vị trí ngón tay
+        const targetEl = document.elementFromPoint(e.touches[0].clientX, currentY);
+        const hoverRow = targetEl ? targetEl.closest('.img-item-row') : null;
+
+        if (hoverRow && hoverRow !== activeTouchRow && hoverRow.parentElement === imgListGroup) {
+          const rect = hoverRow.getBoundingClientRect();
+          const next = currentY > rect.top + rect.height / 2;
+          imgListGroup.insertBefore(activeTouchRow, next ? hoverRow.nextSibling : hoverRow);
+        }
+      }, { passive: false });
+
+      handle.addEventListener('touchend', () => {
+        if (activeTouchRow) {
+          activeTouchRow.classList.remove('is-dragging');
+          activeTouchRow = null;
+          reindexRows();
+        }
+      });
+
+      handle.addEventListener('touchcancel', () => {
+        if (activeTouchRow) {
+          activeTouchRow.classList.remove('is-dragging');
+          activeTouchRow = null;
+          reindexRows();
+        }
       });
     }
 
@@ -383,7 +494,7 @@
       showFatalError();
     });
 
-    // BẬT POPUP NGAY LẬP TỨC: Không để lệnh nằm sau Promise nào để Safari không chặn
+    // BẬT POPUP ĐĂNG NHẬP GOOGLE
     btnGoogleLogin.addEventListener('click', () => {
       loginStatus.className = 'status-msg';
       loginStatus.textContent = 'Đang mở cửa sổ đăng nhập Google...';
@@ -415,7 +526,9 @@
     function createRow(url = '') {
       const row = document.createElement('div');
       row.className = 'img-item-row';
+      row.draggable = true; // Kích hoạt kéo thả cho PC
       row.innerHTML = `
+        <div class="drag-handle" title="Giữ và kéo để đổi thứ tự">⠿</div>
         <span class="row-index">#</span>
         <img class="img-preview" src="${isValidHttpUrl(url) ? url : 'https://via.placeholder.com/150x200?text=No+Img'}" onerror="this.src='https://via.placeholder.com/150x200?text=Loi+Anh'" />
         <div class="img-input-box">
@@ -437,6 +550,9 @@
         row.remove();
         reindexRows();
       });
+
+      // Gắn sự kiện kéo thả vào dòng ảnh vừa tạo
+      attachDragAndDropHandlers(row);
 
       imgListGroup.appendChild(row);
       reindexRows();
